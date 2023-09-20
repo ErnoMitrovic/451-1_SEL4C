@@ -21,7 +21,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "license" : "CC0-4.0",
+  "license" : "SEE LICENSE IN LICENSE",
   "eslintConfig": {
     "extends": [
       "react-app",
