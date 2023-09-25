@@ -2,7 +2,6 @@ import React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
@@ -11,21 +10,34 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
+import { useNavigate } from 'react-router-dom';
 
 export function Navibar() {
     const [auth, setAuth] = React.useState(true);
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [mainMenuAnchorEl, setMainMenuAnchorEl] = React.useState(null);
+    const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
+    const navigate = useNavigate();
 
     const handleChange = (event) => {
         setAuth(event.target.checked);
     };
 
-    const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleMainMenu = (event) => {
+        setMainMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleUserMenu = (event) => {
+        setUserMenuAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
-        setAnchorEl(null);
+        setMainMenuAnchorEl(null);
+        setUserMenuAnchorEl(null);
+    };
+
+    const handleMenuItemClick = (route) => {
+        navigate(route);
+        handleClose();
     };
 
     return (
@@ -43,19 +55,47 @@ export function Navibar() {
                 />
             </FormGroup>
             <AppBar position="static">
-                <Toolbar sx={{ bgcolor: '#041E42'}}>
+                <Toolbar sx={{ bgcolor: '#041E42' }}>
                     <IconButton
                         size="large"
                         edge="start"
                         color="inherit"
                         aria-label="menu"
+                        onClick={handleMainMenu}
                         sx={{ mr: 2 }}
                     >
-                        <MenuIcon/>
+                        <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        SEL4C
-                    </Typography>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={mainMenuAnchorEl}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(mainMenuAnchorEl)}
+                        onClose={handleClose}
+                    >
+                        <MenuItem onClick={() => handleMenuItemClick('/')}>Panel de métricas</MenuItem>
+                        <MenuItem onClick={() => handleMenuItemClick('/admin')}>Respuestas de actividades y Usuario</MenuItem>
+                    </Menu>
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexGrow: 1,
+                        height: '100%',
+                    }}>
+                        <img
+                            src={process.env.PUBLIC_URL + '/sel4c-logo-white.png'}
+                            alt="SEL4C Logo"
+                            style={{ height: '4rem' }}
+                        />
+                    </Box>
                     {auth && (
                         <div>
                             <IconButton
@@ -63,14 +103,14 @@ export function Navibar() {
                                 aria-label="account of current user"
                                 aria-controls="menu-appbar"
                                 aria-haspopup="true"
-                                onClick={handleMenu}
+                                onClick={handleUserMenu}
                                 color="inherit"
                             >
                                 <AccountCircle />
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
-                                anchorEl={anchorEl}
+                                anchorEl={userMenuAnchorEl}
                                 anchorOrigin={{
                                     vertical: 'top',
                                     horizontal: 'right',
@@ -80,11 +120,11 @@ export function Navibar() {
                                     vertical: 'top',
                                     horizontal: 'right',
                                 }}
-                                open={Boolean(anchorEl)}
+                                open={Boolean(userMenuAnchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={() => handleMenuItemClick('/profile')}>Profile</MenuItem>
+                                <MenuItem onClick={() => handleMenuItemClick('/logout')}>Logout</MenuItem>
                             </Menu>
                         </div>
                     )}
