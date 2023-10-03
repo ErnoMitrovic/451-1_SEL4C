@@ -10,7 +10,7 @@ export function Sel4cCard(props) {
             <Container maxWidth="lg" >
                 <Box sx={{
                     display: 'flex',
-                    flexDirection: 'row',
+                    flexDirection: props.direction || 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexWrap: 'wrap',

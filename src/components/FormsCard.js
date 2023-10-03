@@ -1,5 +1,8 @@
-import { Box, Stack, Typography, Input, FormControl, InputLabel, FormHelperText, Button } from "@mui/material";
+import { Stack, Typography, Input, FormControl, InputLabel, FormHelperText, Button } from "@mui/material";
 import React from "react";
+import { Sel4cCard } from "./Sel4cCard";
+import { createToken } from "../models/token";
+import Cookies from 'universal-cookie';
 
 export function FormsCard() {
 
@@ -25,28 +28,42 @@ export function FormsCard() {
         return '';
     }
 
+    // If email is valid and password is not empty, then login
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        if (!setEmailError(email) && password) {
+            // Login
+            console.log('Login');
+            await createToken(email, password)
+                .then((response) => {
+                    const cookies = new Cookies();
+                    const token = response.data.token
+                    cookies.set('token', token, { path: '/' })
+                    console.log('Token: ' + token)
+                })
+                .catch((error) => {
+                window.alert('Invalid email or password');
+                console.log(error);
+            });
+        }
+    }
+
     // sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
     return (
-        <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'>
+        <Sel4cCard>
             <Stack spacing={2} maxWidth='md'
+                m={2}
                 minWidth='xs'
-                border={25}
-                padding={2}
-                borderRadius={10}
-                margin={2}
                 borderColor='primary.main'
                 alignItems='center'>
                 <Typography variant="h2" align="center" sx={{ letterSpacing: 6 }} >
                     SEL4C
                 </Typography>
-                <Typography variant="h4" align="center" sx={{ letterSpacing: 2 }} width='60%' >
+                <Typography variant="h4" align="center" sx={{ letterSpacing: 2 }} >
                     Social Entrepreneurship Learning 4 Complexity.
                 </Typography>
-                <Stack width={0.8} spacing={2}>
-                    <FormControl>
+                <Stack component='form' width={0.7} spacing={2} alignItems='center' onSubmit={handleLogin}>
+                    <FormControl fullWidth>
                         <InputLabel htmlFor="email">Email</InputLabel>
                         <Input
                             id="email"
@@ -57,7 +74,7 @@ export function FormsCard() {
                         />
                         <FormHelperText id="email-helper-text">{displayHelperTextEmail()}</FormHelperText>
                     </FormControl>
-                    <FormControl>
+                    <FormControl fullWidth>
                         <InputLabel htmlFor="password">Password</InputLabel>
                         <Input
                             id="password"
@@ -69,9 +86,9 @@ export function FormsCard() {
                         />
                         <FormHelperText id="password-helper-text">{displayhelperTextPassword()}</FormHelperText>
                     </FormControl>
-                    <Button variant="contained" >Login</Button>
+                    <Button type="submit" variant="contained">Login</Button>
                 </Stack>
             </Stack>
-        </Box>
+        </Sel4cCard>
     );
 }
