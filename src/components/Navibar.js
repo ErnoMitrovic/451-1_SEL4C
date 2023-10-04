@@ -82,7 +82,7 @@ export function Navibar() {
                         onClose={handleClose}
                     >
                         <MenuItem onClick={() => handleMenuItemClick('/')}>Panel de métricas</MenuItem>
-                        <MenuItem onClick={() => handleMenuItemClick('/admin')}>Respuestas de actividades y Usuario</MenuItem>
+                        <MenuItem onClick={() => handleMenuItemClick('/admin')}>Usuarios y respuestas de actividades</MenuItem>
                     </Menu>
                     <Box sx={{
                         display: 'flex',
