@@ -15,7 +15,7 @@ import * as XLSX from "xlsx";
 
 function transformItem(item) {
     // Flatten the 'initial' and 'final' objects
-    const transformedItem =  {
+    const transformedItem = {
         id: item.id,
         full_name: item.full_name,
         academic_degree: item.academic_degree,
@@ -303,227 +303,230 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
 
 
     return (
-        <Box sx={{
+        <Grid container sx={{
             className: 'reset-margins',
-            display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
             marginLeft: '2rem',
-            width: '30rem',
             maxWidth: '100%',
             padding: '2rem',
+            overflowY: 'scroll',
         }}>
-            <Typography variant='h6' sx={{ marginBottom: '1rem', color: 'gray' }}>Filtrar datos:</Typography>
-
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="sex-multiple-checkbox-label">Sexos</InputLabel>
-                <Select
-                    labelId="sex-multiple-checkbox-label"
-                    id="sex-multiple-checkbox"
-                    multiple
-                    value={selectedSexs}
-                    onChange={handleSexChange}
-                    input={<OutlinedInput label="Sexos" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
+            <Grid item xs={12}>
+                <Typography variant='h6' sx={{ textAlign: 'center', marginBottom: '1rem', color: 'gray' }}>Filtrar datos</Typography>
+            </Grid>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <FormControl sx={{ m: 1, width: 200 }}>
+                    <InputLabel id="sex-multiple-checkbox-label">Sexos</InputLabel>
+                    <Select
+                        labelId="sex-multiple-checkbox-label"
+                        id="sex-multiple-checkbox"
+                        multiple
+                        value={selectedSexs}
+                        onChange={handleSexChange}
+                        input={<OutlinedInput label="Sexos" />}
+                        renderValue={(selected) => selected.join(", ")}
+                        MenuProps={MenuProps}
                     >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedSexs}
-                                indeterminate={
-                                    selectedSexs.length > 0 && selectedSexs.length < sexs.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {sexs.map((option) => (
-                        <MenuItem key={option} value={option}>
+                        <MenuItem
+                            value="all"
+                        >
                             <ListItemIcon>
-                                <Checkbox checked={selectedSexs.indexOf(option) > -1} />
+                                <Checkbox
+                                    checked={isAllSelectedSexs}
+                                    indeterminate={
+                                        selectedSexs.length > 0 && selectedSexs.length < sexs.length
+                                    }
+                                />
                             </ListItemIcon>
-                            <ListItemText primary={option} />
+                            <ListItemText
+                                primary="Todos"
+                            />
                         </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+                        {sexs.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                <ListItemIcon>
+                                    <Checkbox checked={selectedSexs.indexOf(option) > -1} />
+                                </ListItemIcon>
+                                <ListItemText primary={option} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Grid>
 
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="discipline-multiple-checkbox-label">Disciplinas</InputLabel>
-                <Select
-                    labelId="discipline-multiple-checkbox-label"
-                    id="discipline-multiple-checkbox"
-                    multiple
-                    value={selectedDisciplines}
-                    onChange={handleChangeDisciplines}
-                    input={<OutlinedInput label="Disciplinas" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <FormControl sx={{ m: 1, width: 200 }}>
+                    <InputLabel id="discipline-multiple-checkbox-label">Disciplinas</InputLabel>
+                    <Select
+                        labelId="discipline-multiple-checkbox-label"
+                        id="discipline-multiple-checkbox"
+                        multiple
+                        value={selectedDisciplines}
+                        onChange={handleChangeDisciplines}
+                        input={<OutlinedInput label="Disciplinas" />}
+                        renderValue={(selected) => selected.join(", ")}
+                        MenuProps={MenuProps}
                     >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedDisciplines}
-                                indeterminate={
-                                    selectedDisciplines.length > 0 && selectedDisciplines.length < disciplines.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {disciplines.map((option) => (
-                        <MenuItem key={option} value={option}>
+                        <MenuItem
+                            value="all"
+                        >
                             <ListItemIcon>
-                                <Checkbox checked={selectedDisciplines.indexOf(option) > -1} />
+                                <Checkbox
+                                    checked={isAllSelectedDisciplines}
+                                    indeterminate={
+                                        selectedDisciplines.length > 0 && selectedDisciplines.length < disciplines.length
+                                    }
+                                />
                             </ListItemIcon>
-                            <ListItemText primary={option} />
+                            <ListItemText
+                                primary="Todos"
+                            />
                         </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+                        {disciplines.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                <ListItemIcon>
+                                    <Checkbox checked={selectedDisciplines.indexOf(option) > -1} />
+                                </ListItemIcon>
+                                <ListItemText primary={option} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Grid>
 
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="country-multiple-checkbox-label">Países</InputLabel>
-                <Select
-                    labelId="country-multiple-checkbox-label"
-                    id="country-multiple-checkbox"
-                    multiple
-                    value={selectedCountries}
-                    onChange={handleChangeCountry}
-                    input={<OutlinedInput label="Países" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <FormControl sx={{ m: 1, width: 200 }}>
+                    <InputLabel id="country-multiple-checkbox-label">Países</InputLabel>
+                    <Select
+                        labelId="country-multiple-checkbox-label"
+                        id="country-multiple-checkbox"
+                        multiple
+                        value={selectedCountries}
+                        onChange={handleChangeCountry}
+                        input={<OutlinedInput label="Países" />}
+                        renderValue={(selected) => selected.join(', ')}
+                        MenuProps={MenuProps}
                     >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedCountries}
-                                indeterminate={
-                                    selectedCountries.length > 0 && selectedCountries.length < countries.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {countries.map((country) => (
-                        <MenuItem key={country} value={country}>
+                        <MenuItem
+                            value="all"
+                        >
                             <ListItemIcon>
-                                <Checkbox checked={selectedCountries.indexOf(country) > -1} />
+                                <Checkbox
+                                    checked={isAllSelectedCountries}
+                                    indeterminate={
+                                        selectedCountries.length > 0 && selectedCountries.length < countries.length
+                                    }
+                                />
                             </ListItemIcon>
-                            <ListItemText primary={country} />
+                            <ListItemText
+                                primary="Todos"
+                            />
                         </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+                        {countries.map((country) => (
+                            <MenuItem key={country} value={country}>
+                                <ListItemIcon>
+                                    <Checkbox checked={selectedCountries.indexOf(country) > -1} />
+                                </ListItemIcon>
+                                <ListItemText primary={country} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Grid>
 
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="academic-degree-multiple-checkbox-label">Estudios</InputLabel>
-                <Select
-                    labelId="academic-degree-multiple-checkbox-label"
-                    id="academic-degree-multiple-checkbox"
-                    multiple
-                    value={selectedAcademicDegrees}
-                    onChange={handleChangeAcademicDegrees}
-                    input={<OutlinedInput label="Estudios" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <FormControl sx={{ m: 1, width: 200 }}>
+                    <InputLabel id="academic-degree-multiple-checkbox-label">Estudios</InputLabel>
+                    <Select
+                        labelId="academic-degree-multiple-checkbox-label"
+                        id="academic-degree-multiple-checkbox"
+                        multiple
+                        value={selectedAcademicDegrees}
+                        onChange={handleChangeAcademicDegrees}
+                        input={<OutlinedInput label="Estudios" />}
+                        renderValue={(selected) => selected.join(", ")}
+                        MenuProps={MenuProps}
                     >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedAcademicDegrees}
-                                indeterminate={
-                                    selectedAcademicDegrees.length > 0 && selectedAcademicDegrees.length < academic_degrees.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {academic_degrees.map((option) => (
-                        <MenuItem key={option} value={option}>
+                        <MenuItem
+                            value="all"
+                        >
                             <ListItemIcon>
-                                <Checkbox checked={selectedAcademicDegrees.indexOf(option) > -1} />
+                                <Checkbox
+                                    checked={isAllSelectedAcademicDegrees}
+                                    indeterminate={
+                                        selectedAcademicDegrees.length > 0 && selectedAcademicDegrees.length < academic_degrees.length
+                                    }
+                                />
                             </ListItemIcon>
-                            <ListItemText primary={option} />
+                            <ListItemText
+                                primary="Todos"
+                            />
                         </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+                        {academic_degrees.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                <ListItemIcon>
+                                    <Checkbox checked={selectedAcademicDegrees.indexOf(option) > -1} />
+                                </ListItemIcon>
+                                <ListItemText primary={option} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Grid>
 
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="institution-checkbox-label">Instituciones</InputLabel>
-                <Select
-                    labelId="institution-multiple-checkbox-label"
-                    id="institution-multiple-checkbox"
-                    multiple
-                    value={selectedInstitutions}
-                    onChange={handleChangeInstitutions}
-                    input={<OutlinedInput label="Instituciones" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
+            <Grid item xs={12} display='flex' justifyContent='center'>
+                <FormControl sx={{ m: 1, width: 200 }}>
+                    <InputLabel id="institution-checkbox-label">Instituciones</InputLabel>
+                    <Select
+                        labelId="institution-multiple-checkbox-label"
+                        id="institution-multiple-checkbox"
+                        multiple
+                        value={selectedInstitutions}
+                        onChange={handleChangeInstitutions}
+                        input={<OutlinedInput label="Instituciones" />}
+                        renderValue={(selected) => selected.join(", ")}
+                        MenuProps={MenuProps}
                     >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedInstitutions}
-                                indeterminate={
-                                    selectedInstitutions.length > 0 && selectedInstitutions.length < institutions.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {institutions.map((option) => (
-                        <MenuItem key={option} value={option}>
+                        <MenuItem
+                            value="all"
+                        >
                             <ListItemIcon>
-                                <Checkbox checked={selectedInstitutions.indexOf(option) > -1} />
+                                <Checkbox
+                                    checked={isAllSelectedInstitutions}
+                                    indeterminate={
+                                        selectedInstitutions.length > 0 && selectedInstitutions.length < institutions.length
+                                    }
+                                />
                             </ListItemIcon>
-                            <ListItemText primary={option} />
+                            <ListItemText
+                                primary="Todos"
+                            />
                         </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+                        {institutions.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                <ListItemIcon>
+                                    <Checkbox checked={selectedInstitutions.indexOf(option) > -1} />
+                                </ListItemIcon>
+                                <ListItemText primary={option} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Grid>
 
-
-            <Box sx={{
+            <Grid item xs={12} sx={{
                 width: 250,
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
                 margin: '2rem 0',
             }}>
                 <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Edad en años:</Typography>
-                <Grid container spacing={2} alignItems='center'>
+                <Grid container spacing={2} alignItems='center' display='flex' justifyContent='center'>
                     <Grid item xs={12} sm={5}>
                         <Slider
                             getAriaLabel={() => 'Rango de Edad'}
@@ -534,8 +537,8 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
                             max={100}
                         />
                     </Grid>
-                    <Grid item xs={4} sm={2}>
-                        <Input
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
+                        <Input 
                             value={selectedAge[0]}
                             size="small"
                             onChange={handleMinAgeInputChange}
@@ -549,10 +552,10 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
                             }}
                         />
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Typography variant='body1' sx={{ color: 'gray' }}>a</Typography>
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Input
                             value={selectedAge[1]}
                             size="small"
@@ -568,35 +571,39 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
                         />
                     </Grid>
                 </Grid>
-            </Box>
+            </Grid>
 
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <FormGroup>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={initialOrFinal}
+                                onChange={handleTestChange}
+                                aria-label="login switch"
+                            />
+                        }
+                        label={initialOrFinal ? 'Posttest' : 'Pretest'}
+                    />
+                </FormGroup>
+            </Grid>
 
-            <FormGroup>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={initialOrFinal}
-                            onChange={handleTestChange}
-                            aria-label="login switch"
-                        />
-                    }
-                    label={initialOrFinal ? 'Posttest' : 'Pretest'}
-                />
-            </FormGroup>
-
-
-            <Button variant="contained" sx={{ marginTop: '1rem' }}
-                onClick={() => {
-                    handleUpdateRadarData();
-                }}>
-                Aplicar filtros
-            </Button>
-            <Button variant="contained" sx={{ marginTop: '1rem' }}
-                onClick={() => {
-                    downloadExcel(filteredRadarData);
-                }}>
-                Descargar Excel
-            </Button>
-        </Box>
+            <Grid item xs={12} display='flex' justifyContent='center'>
+                <Button variant="contained" sx={{ marginTop: '1rem' }}
+                    onClick={() => {
+                        handleUpdateRadarData();
+                    }}>
+                    Aplicar filtros
+                </Button>
+            </Grid>
+            <Grid item xs={12} display='flex' justifyContent='center'>
+                <Button variant="contained" sx={{ marginTop: '1rem' }}
+                    onClick={() => {
+                        downloadExcel(filteredRadarData);
+                    }}>
+                    Descargar Excel
+                </Button>
+            </Grid>
+        </Grid>
     );
 }

@@ -8,6 +8,7 @@ import { RadarChartFilters } from '../components/RadarChartFilters';
 import { BarChartFilters } from '../components/BarChartFilters';
 import { fetchData, filterData, calculateAverage } from '../components/utils/chartUtils';
 import { users } from '../components/utils/sampleJsons';
+import { Button, Stack, Modal, Container } from '@mui/material';
 
 //export const fetchedData = fetchData();
 const fetchedData = users;
@@ -209,14 +210,34 @@ export default function MetricsPanel() {
         setFinalBarData(newData);
     };
 
+    const [openModal, setOpenModal] = React.useState(false);
+
+    function handleCloseModal() {
+        setOpenModal(false);
+    }
 
     return (
         <div>
-            <Sel4cCard >
-                <RadarChart data={radarData} />
-                <Box className='hide-on-small' sx={{ bgcolor: '#D9D9D9', width: '0.5rem', height: '48rem' }} />
-                <RadarChartFilters fetchedData={fetchedData} updateRadarData={updateRadarData} filteredData={filteredData} />
+            <Sel4cCard flexDirection='column'>
+                <Stack pt={2} alignItems='center'>
+                    <Button variant='outlined' onClick={() => setOpenModal(true)}>Seleccionar filtros</Button>
+                    <RadarChart data={radarData} />
+                </Stack>
             </Sel4cCard>
+            <Modal open={openModal} onClose={handleCloseModal}>
+                <Container sx={{
+                    width: 0.8,
+                    bgcolor: 'background.paper',
+                    border: '2px solid #000',
+                    boxShadow: 24,
+                    p: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <RadarChartFilters fetchedData={fetchedData} updateRadarData={updateRadarData} filteredData={filteredData} />
+                </Container>
+            </Modal>
             <Sel4cCard>
                 <Box sx={{
                     display: 'flex',

@@ -35,7 +35,7 @@ export function FormsCard({ onLogin }) {
         event.preventDefault();
         if (!setEmailError(email) && password) {
             // Login
-            //console.log('Login');
+            console.log(`Password: ${password}`);
             await createToken(email, password)
                 .then((response) => {
                     const cookies = new Cookies();
