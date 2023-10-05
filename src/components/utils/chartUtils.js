@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { getToken } from '../../models/token'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -50,29 +52,18 @@ const countries = [
     'México', 'Afganistán', 'Albania', 'Alemania', 'Algeria', 'Andorra', 'Angola', 'Anguilla', 'Antigua y Barbuda', 'Antillas Holandesas', 'Antártida', 'Arabia Saudita', 'Argentina', 'Armenia', 'Aruba', 'Australia', 'Austria', 'Azerbaiyán', 'Bahamas', 'Bahrein', 'Bangladesh', 'Barbados', 'Belice', 'Benín', 'Bermuda', 'Bielorrusia', 'Bolivia', 'Bosnia-Herzegovina', 'Botswana', 'Brasil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Bután', 'Bélgica', 'Cabo Verde', 'Camboya', 'Camerún', 'Canadá', 'Chad', 'Chile', 'China', 'Chipre', 'Colombia', 'Comores', 'Corea del Norte', 'Corea del Sur', 'Costa Rica', 'Costa de Marfíl', 'Croacia', 'Cuba', 'Dinamarca', 'Djibouti', 'Dominica', 'Ecuador', 'Egipto', 'El Salvador', 'Emiratos Árabes Unidos', 'Eritrea', 'Eslovaquía', 'Eslovenia', 'España', 'Estados Federados de Micronesia', 'Estados Unidos', 'Estonia', 'Etiopía', 'Fiji', 'Filipinas', 'Finlandia', 'Francia', 'Gabón', 'Gambia', 'Georgia', 'Ghana', 'Gibraltar', 'Granada', 'Grecia', 'Groenlandia', 'Guadalupe', 'Guam', 'Guatemala', 'Guinea', 'Guinea Ecuatorial', 'Guinea-Bissau', 'Guyana', 'Guyana Francesa', 'Haití', 'Holanda', 'Honduras', 'Hong Kong', 'Hungría', 'India', 'Indonesia', 'Iraq', 'Irlanda', 'Irán', 'Isla de Navidad', 'Islandia', 'Islas Caimán', 'Islas Cocos', 'Islas Cook', 'Islas Feroe', 'Islas Malvinas', 'Islas Marianas del Norte', 'Islas Marshall', 'Islas Norfolk', 'Islas Salomón', 'Islas Turcas y Caicos', 'Islas Vírgenes Americanas', 'Islas Vírgenes Británicas', 'Israel', 'Italia', 'Jamaica', 'Japón', 'Jordania', 'Kazajstán', 'Kenia', 'Kirguistán', 'Kiribati', 'Kuwait', 'Laos', 'Lesotho', 'Letonia', 'Liberia', 'Libia', 'Liechtenstein', 'Lituania', 'Luxemburgo', 'Líbano', 'Macao', 'Macedonia', 'Madagascar', 'Malasia', 'Malawi', 'Maldivas', 'Mali', 'Malta', 'Marruecos', 'Martinica', 'Mauricio', 'Mauritania', 'Mayotte', 'Moldavia', 'Mongolia', 'Montserrat', 'Mozambique', 'Myanmar', 'Mónaco', 'Namibia', 'Nauru', 'Nepal', 'Nicaragua', 'Niger', 'Nigeria', 'Niue', 'Noruega', 'Nueva Caledonia', 'Nueva Zelanda', 'Omán', 'Pakistán', 'Palau', 'Palestina', 'Panamá', 'Papua Nueva Guinea', 'Paraguay', 'Perú', 'Pitcairn', 'Polinesia Francesa', 'Polonia', 'Portugal', 'Puerto Rico', 'Qatar', 'Reino Unido', 'República Centroafricana', 'República Checa', 'República Democrática del Congo', 'República Dominicana', 'República del Congo', 'Reunión', 'Ruanda', 'Rumanía', 'Rusia', 'Samoa', 'Samoa Americana', 'San Kitts y Nevis', 'San Marino', 'San Vicente y Granadinas', 'Santa Helena', 'Santa Lucía', 'Santo Tomé y Príncipe', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leona', 'Singapur', 'Siria', 'Somalia', 'Sri Lanka', 'Sudáfrica', 'Sudán', 'Suecia', 'Suiza', 'Surinam', 'Swazilandia', 'Sáhara Occidental', 'Tadjikistan', 'Tailandia', 'Taiwán', 'Tanzania', 'Tierras Australes y Antárticas Francesas', 'Timor Oriental', 'Togo', 'Tokelau', 'Tonga', 'Trinidad y Tobago', 'Turkmenistan', 'Turquía', 'Tuvalu', 'Túnez', 'Ucrania', 'Uganda', 'Uruguay', 'Uzbekistán', 'Vanuatu', 'Vaticano', 'Venezuela', 'Vietnam', 'Wallis y Futuna', 'Yemen', 'Zambia', 'Zimbabwe'
 ];
 
-function fetchData(Token) {
-
-    const url = 'http://localhost:8000/api/v1/answers/';
-    const options = {
-        method: 'GET',
+function fetchData() {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all`, {
         headers: {
             'Content-Type': 'application/json',
-            'Authentication': 'Token ' + String(Token),
+            'Authorization': `Token ${getToken()}`
         }
-    };
-    const data = fetch(url, options)
-        .then(response => response.json())
-        .then(data => {
-            return data;
-        })
-        .catch(error => {
-            alert('Lo lamentamos, hubo un error al conectarse al servidor\nIntentelo de nuevo más tarde');
-            console.log(error);
-            return [];
-        });
-
-    return data;
-
+    }).then((response) => {
+        console.log(response.data);
+        return response.data;
+    }).catch((error) => {
+        console.log(error);
+    });
 }
 
 function filterData(filters, data) {
@@ -131,4 +122,5 @@ function calculateAverage(data, initialOrFinal) {
     return averageScores;
 }
 
-export { MenuProps, sexs, academic_degrees, institutions, disciplines, countries, fetchData, filterData, average, calculateAverage };
+export { MenuProps, sexs, academic_degrees, institutions, disciplines, countries,
+    fetchData, filterData, average, calculateAverage };

@@ -404,3 +404,19 @@ export const users =
             }
         },
     ]
+
+export const admins =
+    [
+        {
+            "id": 1,
+            "full_name": "Administrador Inicial",
+            "email": "admin@example.com",
+            "is_active": true,
+        },
+        {
+            "id": 2,
+            "full_name": "Administrador Final",
+            "email": "admin2@examples.com",
+            "is_active": true,
+        },
+    ]

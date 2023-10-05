@@ -1,7 +1,6 @@
 import './MetricsPanel.sass';
 import React from 'react';
 import Box from '@mui/material/Box';
-import { Navibar } from '../components/Navibar';
 import { Sel4cCard } from '../components/Sel4cCard';
 import { RadarChart } from '../components/RadarChart';
 import { BarChart } from '../components/BarChart';
@@ -213,7 +212,6 @@ export default function MetricsPanel() {
 
     return (
         <div>
-            <Navibar />
             <Sel4cCard >
                 <RadarChart data={radarData} />
                 <Box className='hide-on-small' sx={{ bgcolor: '#D9D9D9', width: '0.5rem', height: '48rem' }} />

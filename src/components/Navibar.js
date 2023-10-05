@@ -1,26 +1,13 @@
 import React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
+import { AppBar, Box, Toolbar, IconButton, MenuItem, Menu } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import { useNavigate } from 'react-router-dom';
 
-export function Navibar() {
-    const [auth, setAuth] = React.useState(true);
+export function Navibar({ isAuthenticated, onLogout }) {
     const [mainMenuAnchorEl, setMainMenuAnchorEl] = React.useState(null);
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
     const navigate = useNavigate();
-
-    const handleChange = (event) => {
-        setAuth(event.target.checked);
-    };
 
     const handleMainMenu = (event) => {
         setMainMenuAnchorEl(event.currentTarget);
@@ -36,24 +23,16 @@ export function Navibar() {
     };
 
     const handleMenuItemClick = (route) => {
-        navigate(route);
+        if (typeof route === 'function') {
+            onLogout();
+        } else {
+            navigate(route);
+        }
         handleClose();
     };
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <FormGroup>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={auth}
-                            onChange={handleChange}
-                            aria-label="login switch"
-                        />
-                    }
-                    label={auth ? 'Logout' : 'Login'}
-                />
-            </FormGroup>
             <AppBar position="static">
                 <Toolbar sx={{ bgcolor: '#041E42' }}>
                     <IconButton
@@ -96,7 +75,7 @@ export function Navibar() {
                             style={{ height: '4rem' }}
                         />
                     </Box>
-                    {auth && (
+                    {isAuthenticated && (
                         <div>
                             <IconButton
                                 size="large"
@@ -124,7 +103,7 @@ export function Navibar() {
                                 onClose={handleClose}
                             >
                                 <MenuItem onClick={() => handleMenuItemClick('/profile')}>Profile</MenuItem>
-                                <MenuItem onClick={() => handleMenuItemClick('/logout')}>Logout</MenuItem>
+                                <MenuItem onClick={() => handleMenuItemClick(onLogout)}>Logout</MenuItem>
                             </Menu>
                         </div>
                     )}
