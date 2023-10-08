@@ -1,7 +1,7 @@
 // React components.
-import React from "react";
+import React, { useEffect } from "react";
 import { styled } from '@mui/material/styles';
-import { Box, Typography, Slider, Grid, Switch, FormControlLabel, FormGroup, Button } from "@mui/material";
+import { Typography, Slider, Grid, Switch, FormControlLabel, FormGroup } from "@mui/material";
 import MuiInput from '@mui/material/Input';
 import Multiselect from "./Filters/Multiselect";
 
@@ -11,71 +11,16 @@ import { disciplines, sexs, academic_degrees, institutions, countries } from "./
 // Functions.
 import { filterData, calculateAverage } from "./utils/chartUtils";
 
-// Export data to Excel.
-import * as XLSX from "xlsx";
-
-function transformItem(item) {
-    // Flatten the 'initial' and 'final' objects
-    const transformedItem = {
-        id: item.id,
-        full_name: item.full_name,
-        academic_degree: item.academic_degree,
-        institution: item.institution,
-        gender: item.gender,
-        age: item.age,
-        country: item.country,
-        discipline: item.discipline,
-        user: item.user,
-    };
-
-    // Append `initial_` to the keys of the initial object
-    for (const key in item.initial) {
-        if (item.initial.hasOwnProperty(key)) {
-            transformedItem[`initial_${key}`] = item.initial[key];
-        }
-    }
-
-    // Append `final_` to the keys of the final object
-    for (const key in item.final) {
-        if (item.initial.hasOwnProperty(key)) {
-            transformedItem[`final_${key}`] = item.final[key];
-        }
-    }
-
-    return {
-        ...transformedItem,
-    };
-}
-
-function transformData(data) {
-    // Use .map to transform each item in the data array
-    return data.map(transformItem);
-}
-
-function downloadExcel(data) {
-    const transformedData = transformData(data);
-    const worksheet = XLSX.utils.json_to_sheet(transformedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
-    //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
-    XLSX.writeFile(workbook, "DataSheet.xlsx");
-};
-
-
 const Input = styled(MuiInput)`
 width: 42px;
 `;
 
 
-export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }) {
+export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredRadarData, onFiltersChange, currentFilters }) {
 
-    const [selectedSexs, setSelectedSexs] = React.useState([
-        'Masculino',
-        'Femenino',
-        'No binarie',
-        'Prefiero no decir'
-    ]);
+    const [selectedSexs, setSelectedSexs] = React.useState(
+        currentFilters.sex
+    );
     const isAllSelectedSexs = sexs.length > 0 && selectedSexs.length === sexs.length;
     const handleSexChange = (event) => {
         const value = event.target.value;
@@ -87,14 +32,9 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
     };
 
 
-    const [selectedDisciplines, setSelectedDisciplines] = React.useState([
-        'Arquitectura, Arte y Diseño',
-        'Ciencias Sociales',
-        'Ciencias de la Salud',
-        'Humanidades y Educación',
-        'Ingeniería y Ciencias',
-        'Negocios'
-    ]);
+    const [selectedDisciplines, setSelectedDisciplines] = React.useState(
+        currentFilters.disciplines
+    );
     const isAllSelectedDisciplines = disciplines.length > 0 && selectedDisciplines.length === disciplines.length;
     const handleChangeDisciplines = (event) => {
         const value = event.target.value;
@@ -106,7 +46,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
     };
 
 
-    const [selectedCountries, setSelectedCountries] = React.useState(['México']);
+    const [selectedCountries, setSelectedCountries] = React.useState(currentFilters.countries);
     const isAllSelectedCountries = countries.length > 0 && selectedCountries.length === countries.length;
     const handleChangeCountry = (event) => {
         const value = event.target.value;
@@ -118,11 +58,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
     };
 
 
-    const [selectedAcademicDegrees, setSelectedAcademicDegrees] = React.useState([
-        'Pregrado',
-        'Posgrado',
-        'Educación Continua'
-    ]);
+    const [selectedAcademicDegrees, setSelectedAcademicDegrees] = React.useState(currentFilters.academic_degrees);
     const isAllSelectedAcademicDegrees = academic_degrees.length > 0 && selectedAcademicDegrees.length === academic_degrees.length;
     const handleChangeAcademicDegrees = (event) => {
         const value = event.target.value;
@@ -134,7 +70,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
     };
 
 
-    const [selectedInstitutions, setSelectedInstitutions] = React.useState(['Tecnológico de Monterrey', 'Otros']);
+    const [selectedInstitutions, setSelectedInstitutions] = React.useState(currentFilters.institutions);
     const isAllSelectedInstitutions = institutions.length > 0 && selectedInstitutions.length === institutions.length;
     const handleChangeInstitutions = (event) => {
         const value = event.target.value;
@@ -146,8 +82,8 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
     };
 
 
-    const [selectedAge, setSelectedAge] = React.useState([18, 45]);
-    const handleAgeChange = (event, newValue) => {
+    const [selectedAge, setSelectedAge] = React.useState(currentFilters.age);
+    const handleAgeChange = (_, newValue) => {
         setSelectedAge(newValue);
     };
     const handleMinAgeInputChange = (event) => {
@@ -181,7 +117,6 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
         }
     };
 
-
     // Swtich to chose if the chart displays the initial or final average scores.
     const [initialOrFinal, setInitialOrFinal] = React.useState(true);
     const handleTestChange = (event) => {
@@ -189,9 +124,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
     };
 
 
-    // Update the radar chart data. 
-    // filteredRadarData is the data that will be displayed in the chart stored in JSON.
-    const [filteredRadarData, setFilteredRadarData] = React.useState(filteredData);
+
     const handleUpdateRadarData = () => {
 
         if (selectedSexs.length === 0) {
@@ -302,39 +235,68 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
         updateRadarData(newData);
     };
 
+    useEffect(() => {
+        const currentFilters = {
+            sex: selectedSexs,
+            disciplines: selectedDisciplines,
+            countries: selectedCountries,
+            academic_degrees: selectedAcademicDegrees,
+            institutions: selectedInstitutions,
+            age: selectedAge,
+        }
+        onFiltersChange(currentFilters);
+        handleUpdateRadarData();
+    }, [selectedSexs, selectedDisciplines, selectedCountries, selectedAcademicDegrees, selectedInstitutions, selectedAge, initialOrFinal]);
 
     return (
-        <Box sx={{
+        <Grid container sx={{
             className: 'reset-margins',
-            display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
             marginLeft: '2rem',
-            width: '30rem',
             maxWidth: '100%',
             padding: '2rem',
+            overflowY: 'scroll',
         }}>
-            <Typography variant='h6' sx={{ marginBottom: '1rem', color: 'gray' }}>Filtrar datos:</Typography>
 
-            <Multiselect identifier='Sexos' selectedData={selectedSexs} isAllSelected={isAllSelectedSexs} handleChange={handleSexChange} options={sexs} />
-            <Multiselect identifier='Disciplinas' selectedData={selectedDisciplines} isAllSelected={isAllSelectedDisciplines} handleChange={handleChangeDisciplines} options={disciplines} />
-            <Multiselect identifier='Países' selectedData={selectedCountries} isAllSelected={isAllSelectedCountries} handleChange={handleChangeCountry} options={countries} />
-            <Multiselect identifier='Estudios' selectedData={selectedAcademicDegrees} isAllSelected={isAllSelectedAcademicDegrees} handleChange={handleChangeAcademicDegrees} options={academic_degrees} />
-            <Multiselect identifier='Instituciones' selectedData={selectedInstitutions} isAllSelected={isAllSelectedInstitutions} handleChange={handleChangeInstitutions} options={institutions} />
 
-            <Box sx={{
+
+
+
+            <Grid item xs={12}>
+                <Typography variant='h6' sx={{ textAlign: 'center', marginBottom: '1rem', color: 'gray' }}>Filtrar datos</Typography>
+            </Grid>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Sexos' selectedData={selectedSexs} isAllSelected={isAllSelectedSexs} handleChange={handleSexChange} options={sexs} />
+            </Grid>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Disciplinas' selectedData={selectedDisciplines} isAllSelected={isAllSelectedDisciplines} handleChange={handleChangeDisciplines} options={disciplines} />
+            </Grid>
+
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Países' selectedData={selectedCountries} isAllSelected={isAllSelectedCountries} handleChange={handleChangeCountry} options={countries} />
+            </Grid>
+
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Estudios' selectedData={selectedAcademicDegrees} isAllSelected={isAllSelectedAcademicDegrees} handleChange={handleChangeAcademicDegrees} options={academic_degrees} />
+            </Grid>
+
+            <Grid item xs={12} display='flex' justifyContent='center'>
+                <Multiselect identifier='Instituciones' selectedData={selectedInstitutions} isAllSelected={isAllSelectedInstitutions} handleChange={handleChangeInstitutions} options={institutions} />
+            </Grid>
+
+            <Grid item xs={12} sx={{
                 width: 250,
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
                 margin: '2rem 0',
             }}>
                 <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Edad en años:</Typography>
-                <Grid container spacing={2} alignItems='center'>
+                <Grid container spacing={2} alignItems='center' display='flex' justifyContent='center'>
                     <Grid item xs={12} sm={5}>
                         <Slider
                             getAriaLabel={() => 'Rango de Edad'}
@@ -345,7 +307,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
                             max={100}
                         />
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Input
                             value={selectedAge[0]}
                             size="small"
@@ -360,10 +322,10 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
                             }}
                         />
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Typography variant='body1' sx={{ color: 'gray' }}>a</Typography>
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Input
                             value={selectedAge[1]}
                             size="small"
@@ -379,35 +341,22 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
                         />
                     </Grid>
                 </Grid>
-            </Box>
+            </Grid>
 
-
-            <FormGroup>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={initialOrFinal}
-                            onChange={handleTestChange}
-                            aria-label="login switch"
-                        />
-                    }
-                    label={initialOrFinal ? 'Posttest' : 'Pretest'}
-                />
-            </FormGroup>
-
-
-            <Button variant="contained" sx={{ marginTop: '1rem' }}
-                onClick={() => {
-                    handleUpdateRadarData();
-                }}>
-                Aplicar filtros
-            </Button>
-            <Button variant="contained" sx={{ marginTop: '1rem' }}
-                onClick={() => {
-                    downloadExcel(filteredRadarData);
-                }}>
-                Descargar Excel
-            </Button>
-        </Box>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <FormGroup>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={initialOrFinal}
+                                onChange={handleTestChange}
+                                aria-label="login switch"
+                            />
+                        }
+                        label={initialOrFinal ? 'Posttest' : 'Pretest'}
+                    />
+                </FormGroup>
+            </Grid>
+        </Grid>
     );
 }
