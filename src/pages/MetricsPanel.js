@@ -8,12 +8,15 @@ import { RadarChartFilters } from '../components/RadarChartFilters';
 import { BarChartFilters } from '../components/BarChartFilters';
 import { fetchData, filterData, calculateAverage } from '../components/utils/chartUtils';
 import { users } from '../components/utils/sampleJsons';
-import { Button, Stack, Modal, Container } from '@mui/material';
+import { Button, Stack, Modal, Container, IconButton } from '@mui/material';
+// Export data to Excel.
+import * as XLSX from "xlsx";
+import { FilterList, TableChartOutlined } from '@mui/icons-material';
 
 //export const fetchedData = fetchData();
 const fetchedData = users;
 
-var filters = {
+var filtersSelected = {
     sex: ['Masculino', 'Femenino', 'No binarie', 'Prefiero no decir'],
     disciplines: ['Arquitectura, Arte y Diseño', 'Ciencias Sociales', 'Ciencias de la Salud', 'Humanidades y Educación', 'Ingeniería y Ciencias', 'Negocios'],
     countries: ['México'],
@@ -21,15 +24,15 @@ var filters = {
     institutions: ['Tecnológico de Monterrey', 'Otros'],
     age: [18, 45],
 };
-const filteredData = filterData(filters, fetchedData);
-filters['sex'] = ['Masculino']
-const masculineData = calculateAverage(filterData(filters, filteredData), 'final');
-filters['sex'] = ['Femenino']
-const femenineData = calculateAverage(filterData(filters, filteredData), 'final');
-filters['sex'] = ['No binarie']
-const nonBinaryData = calculateAverage(filterData(filters, filteredData), 'final');
-filters['sex'] = ['Prefiero no decir']
-const noSexResponseData = calculateAverage(filterData(filters, filteredData), 'final');
+const filteredData = filterData(filtersSelected, fetchedData);
+filtersSelected['sex'] = ['Masculino']
+const masculineData = calculateAverage(filterData(filtersSelected, filteredData), 'final');
+filtersSelected['sex'] = ['Femenino']
+const femenineData = calculateAverage(filterData(filtersSelected, filteredData), 'final');
+filtersSelected['sex'] = ['No binarie']
+const nonBinaryData = calculateAverage(filterData(filtersSelected, filteredData), 'final');
+filtersSelected['sex'] = ['Prefiero no decir']
+const noSexResponseData = calculateAverage(filterData(filtersSelected, filteredData), 'final');
 const datasets = [{
     label: 'Masculino',
     data: masculineData,
@@ -74,6 +77,9 @@ const datasets = [{
 
 export default function MetricsPanel() {
 
+    // Update the radar chart data. 
+    // filteredRadarData is the data that will be displayed in the chart stored in JSON.
+    const [filteredRadarData, setFilteredRadarData] = React.useState(filteredData);
     const [radarData, setRadarData] = React.useState({
         labels: [
             'Innovación social y sostenibilidad financiera',
@@ -199,6 +205,63 @@ export default function MetricsPanel() {
             borderColor: 'rgb(50, 194, 0)',
         }]
     });
+    function transformItem(item) {
+        // Flatten the 'initial' and 'final' objects
+        const transformedItem = {
+            id: item.id,
+            full_name: item.full_name,
+            academic_degree: item.academic_degree,
+            institution: item.institution,
+            gender: item.gender,
+            age: item.age,
+            country: item.country,
+            discipline: item.discipline,
+            user: item.user,
+        };
+
+        // Append `initial_` to the keys of the initial object
+        for (const key in item.initial) {
+            if (item.initial.hasOwnProperty(key)) {
+                transformedItem[`initial_${key}`] = item.initial[key];
+            }
+        }
+
+        // Append `final_` to the keys of the final object
+        for (const key in item.final) {
+            if (item.initial.hasOwnProperty(key)) {
+                transformedItem[`final_${key}`] = item.final[key];
+            }
+        }
+
+        return {
+            ...transformedItem,
+        };
+    }
+
+    const [filteredDataFromModal, setFilteredDataFromModal] = React.useState(
+        {
+            sex: ['Masculino', 'Femenino', 'No binarie', 'Prefiero no decir'],
+            disciplines: ['Arquitectura, Arte y Diseño', 'Ciencias Sociales', 'Ciencias de la Salud', 'Humanidades y Educación', 'Ingeniería y Ciencias', 'Negocios'],
+            countries: ['México'],
+            academic_degrees: ['Pregrado', 'Posgrado', 'Educación Continua'],
+            institutions: ['Tecnológico de Monterrey', 'Otros'],
+            age: [18, 45],
+        });
+
+    function transformData(data) {
+        // Use .map to transform each item in the data array
+        return data.map(transformItem);
+    }
+
+    function downloadExcel(data) {
+        const transformedData = transformData(data);
+        const worksheet = XLSX.utils.json_to_sheet(transformedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+        //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+        XLSX.writeFile(workbook, "DataSheet.xlsx");
+    };
 
     const updateRadarData = (newData) => {
         setRadarData(newData);
@@ -213,29 +276,44 @@ export default function MetricsPanel() {
     const [openModal, setOpenModal] = React.useState(false);
 
     function handleCloseModal() {
+        updateRadarData(radarData);
         setOpenModal(false);
     }
 
     return (
         <div>
             <Sel4cCard flexDirection='column'>
-                <Stack pt={2} alignItems='center'>
-                    <Button variant='outlined' onClick={() => setOpenModal(true)}>Seleccionar filtros</Button>
+                <Stack maxWidth={1} width='30rem' p={0.5}>
+                    <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
+                        <IconButton
+                            onClick={() => {
+                                downloadExcel(filteredRadarData);
+                            }}>
+                            <TableChartOutlined color='#1d6f42' />
+                        </IconButton>
+                        <IconButton onClick={() => setOpenModal(true)}>
+                            <FilterList />
+                        </IconButton>
+                    </Stack>
                     <RadarChart data={radarData} />
                 </Stack>
             </Sel4cCard>
             <Modal open={openModal} onClose={handleCloseModal}>
                 <Container sx={{
-                    width: 0.8,
                     bgcolor: 'background.paper',
-                    border: '2px solid #000',
+                    border: '4px solid #000',
                     boxShadow: 24,
-                    p: 4,
+                    p: 2,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
-                    <RadarChartFilters fetchedData={fetchedData} updateRadarData={updateRadarData} filteredData={filteredData} />
+                    <RadarChartFilters
+                        fetchedData={fetchedData}
+                        updateRadarData={updateRadarData}
+                        setFilteredRadarData={setFilteredRadarData}
+                        onFiltersChange={setFilteredDataFromModal}
+                        currentFilters={filteredDataFromModal} />
                 </Container>
             </Modal>
             <Sel4cCard>

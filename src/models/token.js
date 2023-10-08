@@ -7,7 +7,6 @@ export async function createToken(email, password) {
         password: password
     }
     let json = JSON.stringify(userCredentials)
-    console.log(`ENV VARIABLE: ${process.env.REACT_APP_API_BASE_URL}`)
     return axios.post(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/token/`, json, {
         headers: {
             'Content-Type': 'application/json',
