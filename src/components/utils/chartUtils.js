@@ -52,18 +52,24 @@ const countries = [
     'México', 'Afganistán', 'Albania', 'Alemania', 'Algeria', 'Andorra', 'Angola', 'Anguilla', 'Antigua y Barbuda', 'Antillas Holandesas', 'Antártida', 'Arabia Saudita', 'Argentina', 'Armenia', 'Aruba', 'Australia', 'Austria', 'Azerbaiyán', 'Bahamas', 'Bahrein', 'Bangladesh', 'Barbados', 'Belice', 'Benín', 'Bermuda', 'Bielorrusia', 'Bolivia', 'Bosnia-Herzegovina', 'Botswana', 'Brasil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Bután', 'Bélgica', 'Cabo Verde', 'Camboya', 'Camerún', 'Canadá', 'Chad', 'Chile', 'China', 'Chipre', 'Colombia', 'Comores', 'Corea del Norte', 'Corea del Sur', 'Costa Rica', 'Costa de Marfíl', 'Croacia', 'Cuba', 'Dinamarca', 'Djibouti', 'Dominica', 'Ecuador', 'Egipto', 'El Salvador', 'Emiratos Árabes Unidos', 'Eritrea', 'Eslovaquía', 'Eslovenia', 'España', 'Estados Federados de Micronesia', 'Estados Unidos', 'Estonia', 'Etiopía', 'Fiji', 'Filipinas', 'Finlandia', 'Francia', 'Gabón', 'Gambia', 'Georgia', 'Ghana', 'Gibraltar', 'Granada', 'Grecia', 'Groenlandia', 'Guadalupe', 'Guam', 'Guatemala', 'Guinea', 'Guinea Ecuatorial', 'Guinea-Bissau', 'Guyana', 'Guyana Francesa', 'Haití', 'Holanda', 'Honduras', 'Hong Kong', 'Hungría', 'India', 'Indonesia', 'Iraq', 'Irlanda', 'Irán', 'Isla de Navidad', 'Islandia', 'Islas Caimán', 'Islas Cocos', 'Islas Cook', 'Islas Feroe', 'Islas Malvinas', 'Islas Marianas del Norte', 'Islas Marshall', 'Islas Norfolk', 'Islas Salomón', 'Islas Turcas y Caicos', 'Islas Vírgenes Americanas', 'Islas Vírgenes Británicas', 'Israel', 'Italia', 'Jamaica', 'Japón', 'Jordania', 'Kazajstán', 'Kenia', 'Kirguistán', 'Kiribati', 'Kuwait', 'Laos', 'Lesotho', 'Letonia', 'Liberia', 'Libia', 'Liechtenstein', 'Lituania', 'Luxemburgo', 'Líbano', 'Macao', 'Macedonia', 'Madagascar', 'Malasia', 'Malawi', 'Maldivas', 'Mali', 'Malta', 'Marruecos', 'Martinica', 'Mauricio', 'Mauritania', 'Mayotte', 'Moldavia', 'Mongolia', 'Montserrat', 'Mozambique', 'Myanmar', 'Mónaco', 'Namibia', 'Nauru', 'Nepal', 'Nicaragua', 'Niger', 'Nigeria', 'Niue', 'Noruega', 'Nueva Caledonia', 'Nueva Zelanda', 'Omán', 'Pakistán', 'Palau', 'Palestina', 'Panamá', 'Papua Nueva Guinea', 'Paraguay', 'Perú', 'Pitcairn', 'Polinesia Francesa', 'Polonia', 'Portugal', 'Puerto Rico', 'Qatar', 'Reino Unido', 'República Centroafricana', 'República Checa', 'República Democrática del Congo', 'República Dominicana', 'República del Congo', 'Reunión', 'Ruanda', 'Rumanía', 'Rusia', 'Samoa', 'Samoa Americana', 'San Kitts y Nevis', 'San Marino', 'San Vicente y Granadinas', 'Santa Helena', 'Santa Lucía', 'Santo Tomé y Príncipe', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leona', 'Singapur', 'Siria', 'Somalia', 'Sri Lanka', 'Sudáfrica', 'Sudán', 'Suecia', 'Suiza', 'Surinam', 'Swazilandia', 'Sáhara Occidental', 'Tadjikistan', 'Tailandia', 'Taiwán', 'Tanzania', 'Tierras Australes y Antárticas Francesas', 'Timor Oriental', 'Togo', 'Tokelau', 'Tonga', 'Trinidad y Tobago', 'Turkmenistan', 'Turquía', 'Tuvalu', 'Túnez', 'Ucrania', 'Uganda', 'Uruguay', 'Uzbekistán', 'Vanuatu', 'Vaticano', 'Venezuela', 'Vietnam', 'Wallis y Futuna', 'Yemen', 'Zambia', 'Zimbabwe'
 ];
 
-function fetchData() {
-    axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${getToken()}`
-        }
-    }).then((response) => {
-        console.log(response.data);
+async function fetchData() {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error('No token found');
+    }
+
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            }
+        });
         return response.data;
-    }).catch((error) => {
-        console.log(error);
-    });
+    } catch (error) {
+        throw Error('Internal error');
+    }
 }
 
 function filterData(filters, data) {
@@ -72,21 +78,21 @@ function filterData(filters, data) {
         return [];
     }
 
-    return data.filter(user => {
+    return data.filter(dat => {
         // Check if the user meets the criteria for each filter
         return (
             // Filter by age
-            filters.age[0] <= user.age && user.age <= filters.age[1] &&
+            filters.age[0] <= dat.age && dat.age <= filters.age[1] &&
             // Filter by gender
-            filters.sex.includes(user.gender) &&
+            filters.sex.includes(dat.gender) &&
             // Filter by academic degree
-            filters.academic_degrees.includes(user.academic_degree) &&
+            filters.academic_degrees.includes(dat.academic_degree) &&
             // Filter by institution
-            filters.institutions.includes(user.institution) &&
+            filters.institutions.includes(dat.institution) &&
             // Filter by discipline
-            filters.disciplines.includes(user.discipline) &&
+            filters.disciplines.includes(dat.discipline) &&
             // Filter by country
-            filters.countries.includes(user.country)
+            filters.countries.includes(dat.country)
         );
     });
 }
@@ -111,6 +117,11 @@ function calculateAverage(data, initialOrFinal) {
         "critical_thinking_score",
         "innovative_thinking_score"
     ];
+
+    // Filter unanswered forms
+    if (data[initialOrFinal] === 0) {
+        data = data.filter(user => user[initialOrFinal] !== 0);
+    }
 
     const averageScores = propertiesToAverage.map(property => {
         const filteredValues = data

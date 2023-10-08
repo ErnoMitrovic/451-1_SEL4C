@@ -1,12 +1,13 @@
 // React components.
 import React from "react";
 import { styled } from '@mui/material/styles';
-import { Box, ListItemIcon, OutlinedInput, InputLabel, MenuItem, FormControl, ListItemText, Select, Checkbox, Typography, Slider, Grid, Switch, FormControlLabel, FormGroup, Button } from "@mui/material";
+import { Box, Typography, Slider, Grid, Switch, FormControlLabel, FormGroup, Button } from "@mui/material";
 import MuiInput from '@mui/material/Input';
+import Multiselect from "./Filters/Multiselect";
 
 // SEL4C custom data and functions.
 // Data.
-import { MenuProps, disciplines, sexs, academic_degrees, institutions, countries } from "./utils/chartUtils";
+import { disciplines, sexs, academic_degrees, institutions, countries } from "./utils/chartUtils";
 // Functions.
 import { filterData, calculateAverage } from "./utils/chartUtils";
 
@@ -15,7 +16,7 @@ import * as XLSX from "xlsx";
 
 function transformItem(item) {
     // Flatten the 'initial' and 'final' objects
-    const transformedItem =  {
+    const transformedItem = {
         id: item.id,
         full_name: item.full_name,
         academic_degree: item.academic_degree,
@@ -218,7 +219,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
             institutions: selectedInstitutions,
             age: selectedAge,
         };
-        const initialOrFinalString = initialOrFinal ? 'final' : 'initial';
+        const initialOrFinalString = initialOrFinal ? 'final_score' : 'initial_score';
 
         const jsonData = filterData(filters, fetchedData);
 
@@ -317,201 +318,11 @@ export function RadarChartFilters({ fetchedData, updateRadarData, filteredData }
         }}>
             <Typography variant='h6' sx={{ marginBottom: '1rem', color: 'gray' }}>Filtrar datos:</Typography>
 
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="sex-multiple-checkbox-label">Sexos</InputLabel>
-                <Select
-                    labelId="sex-multiple-checkbox-label"
-                    id="sex-multiple-checkbox"
-                    multiple
-                    value={selectedSexs}
-                    onChange={handleSexChange}
-                    input={<OutlinedInput label="Sexos" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedSexs}
-                                indeterminate={
-                                    selectedSexs.length > 0 && selectedSexs.length < sexs.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {sexs.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedSexs.indexOf(option) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={option} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="discipline-multiple-checkbox-label">Disciplinas</InputLabel>
-                <Select
-                    labelId="discipline-multiple-checkbox-label"
-                    id="discipline-multiple-checkbox"
-                    multiple
-                    value={selectedDisciplines}
-                    onChange={handleChangeDisciplines}
-                    input={<OutlinedInput label="Disciplinas" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedDisciplines}
-                                indeterminate={
-                                    selectedDisciplines.length > 0 && selectedDisciplines.length < disciplines.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {disciplines.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedDisciplines.indexOf(option) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={option} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="country-multiple-checkbox-label">Países</InputLabel>
-                <Select
-                    labelId="country-multiple-checkbox-label"
-                    id="country-multiple-checkbox"
-                    multiple
-                    value={selectedCountries}
-                    onChange={handleChangeCountry}
-                    input={<OutlinedInput label="Países" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedCountries}
-                                indeterminate={
-                                    selectedCountries.length > 0 && selectedCountries.length < countries.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {countries.map((country) => (
-                        <MenuItem key={country} value={country}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedCountries.indexOf(country) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={country} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="academic-degree-multiple-checkbox-label">Estudios</InputLabel>
-                <Select
-                    labelId="academic-degree-multiple-checkbox-label"
-                    id="academic-degree-multiple-checkbox"
-                    multiple
-                    value={selectedAcademicDegrees}
-                    onChange={handleChangeAcademicDegrees}
-                    input={<OutlinedInput label="Estudios" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedAcademicDegrees}
-                                indeterminate={
-                                    selectedAcademicDegrees.length > 0 && selectedAcademicDegrees.length < academic_degrees.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {academic_degrees.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedAcademicDegrees.indexOf(option) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={option} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="institution-checkbox-label">Instituciones</InputLabel>
-                <Select
-                    labelId="institution-multiple-checkbox-label"
-                    id="institution-multiple-checkbox"
-                    multiple
-                    value={selectedInstitutions}
-                    onChange={handleChangeInstitutions}
-                    input={<OutlinedInput label="Instituciones" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedInstitutions}
-                                indeterminate={
-                                    selectedInstitutions.length > 0 && selectedInstitutions.length < institutions.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {institutions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedInstitutions.indexOf(option) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={option} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
+            <Multiselect identifier='Sexos' selectedData={selectedSexs} isAllSelected={isAllSelectedSexs} handleChange={handleSexChange} options={sexs} />
+            <Multiselect identifier='Disciplinas' selectedData={selectedDisciplines} isAllSelected={isAllSelectedDisciplines} handleChange={handleChangeDisciplines} options={disciplines} />
+            <Multiselect identifier='Países' selectedData={selectedCountries} isAllSelected={isAllSelectedCountries} handleChange={handleChangeCountry} options={countries} />
+            <Multiselect identifier='Estudios' selectedData={selectedAcademicDegrees} isAllSelected={isAllSelectedAcademicDegrees} handleChange={handleChangeAcademicDegrees} options={academic_degrees} />
+            <Multiselect identifier='Instituciones' selectedData={selectedInstitutions} isAllSelected={isAllSelectedInstitutions} handleChange={handleChangeInstitutions} options={institutions} />
 
             <Box sx={{
                 width: 250,
