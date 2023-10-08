@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
@@ -7,18 +7,23 @@ import MetricsPanel from './pages/MetricsPanel';
 import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
 import { Navibar } from './components/Navibar';
-import { getToken, removeToken } from './models/token';
-
-function checkAuth() {
-    if (getToken()) {
-        return true;
-    } else {
-        return false;
-    }
-}
+import { removeToken, isAdmin } from './models/token';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(checkAuth());
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        isAdmin()
+            .then(result => {
+                setIsAuthenticated(result);
+                if (result === false) {
+                    removeToken();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking authentication:', error);
+            });
+    }, []);
 
     const onLogin = () => {
         setIsAuthenticated(true);

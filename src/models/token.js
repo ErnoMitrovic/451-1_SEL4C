@@ -25,3 +25,30 @@ export function removeToken() {
     const cookies = new Cookies(req.headers.cookie, { path: '/' });
     cookies.remove('token');
 }
+
+export async function isAdmin() {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error('No token found');
+    }
+
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/me/`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            }
+        });
+
+        const userData = response.data;
+
+        if (userData.is_staff === true) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        throw new Error('Internal error');
+    }
+}

@@ -1,12 +1,12 @@
 import { Stack, Typography, Input, FormControl, InputLabel, FormHelperText, Button } from "@mui/material";
 import React from "react";
 import { Sel4cCard } from "./Sel4cCard";
-import { createToken } from "../models/token";
+import { createToken, isAdmin } from "../models/token";
 import Cookies from 'universal-cookie';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 export function FormsCard({ onLogin }) {
-    const navigate = useNavigate(); // Get the navigate function
+    const navigate = useNavigate();
 
     // Track email
     const [email, setEmail] = React.useState('');
@@ -35,15 +35,20 @@ export function FormsCard({ onLogin }) {
         event.preventDefault();
         if (!setEmailError(email) && password) {
             // Login
-            //console.log('Login');
             await createToken(email, password)
-                .then((response) => {
+                .then(async (response) => {
                     const cookies = new Cookies();
                     const token = response.data.token
                     cookies.set('token', token, { path: '/' });
-                    onLogin();
-                    // Redirect to the index page
-                    navigate('/');
+                    // Check if user is admin, if so, navigate to home page
+                    // else, display error message
+                    if (await isAdmin() === true) {
+                        onLogin();
+                        navigate('/');
+                    } else {
+                        cookies.remove('token');
+                        window.alert('Invalid email or password');
+                    }
                 })
                 .catch((error) => {
                     window.alert('Invalid email or password');
