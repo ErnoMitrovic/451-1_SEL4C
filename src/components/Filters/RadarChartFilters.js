@@ -3,13 +3,13 @@ import React, { useEffect } from "react";
 import { styled } from '@mui/material/styles';
 import { Typography, Slider, Grid, Switch, FormControlLabel, FormGroup } from "@mui/material";
 import MuiInput from '@mui/material/Input';
-import Multiselect from "./Filters/Multiselect";
+import Multiselect from "./Multiselect";
 
 // SEL4C custom data and functions.
 // Data.
-import { disciplines, sexs, academic_degrees, institutions, countries } from "./utils/chartUtils";
+import { disciplines, sexs, academic_degrees, institutions, countries } from "../utils/chartUtils";
 // Functions.
-import { filterData, calculateAverage } from "./utils/chartUtils";
+import { filterData, calculateAverage } from "../utils/chartUtils";
 
 const Input = styled(MuiInput)`
 width: 42px;

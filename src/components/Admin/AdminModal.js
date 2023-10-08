@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, Button, Modal, Grid, FormControl, InputLabel, Input, FormHelperText, IconButton, Alert } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ErrorModal from "../ErrorModal";
 import axios from "axios";
 import { getToken } from "../../models/token";
 
@@ -26,7 +27,7 @@ const styleModalChild = {
     borderRadius: '1rem',
 };
 
-export default function AdminModal({ onSuccess }) {
+export default function AdminModal({ onSuccess, usersData }) {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -45,6 +46,7 @@ export default function AdminModal({ onSuccess }) {
     }
 
     const [openError, setOpenError] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('Error');
     const handleOpenError = () => setOpenError(true);
     const handleCloseError = () => setOpenError(false);
 
@@ -82,6 +84,13 @@ export default function AdminModal({ onSuccess }) {
 
         // Validate email and password
         if (!isEmailValid() || !arePasswordsMatching() || password.length < 5) {
+            return;
+        }
+
+        // Check if email is already in use
+        if (usersData.some(user => user.email === email)) {
+            setErrorMessage('Ese correo ya está en uso.');
+            handleOpenError();
             return;
         }
 
@@ -124,6 +133,7 @@ export default function AdminModal({ onSuccess }) {
         } catch (error) {
             // Handle errors, delete on production?
             console.error('Error:', error);
+            setErrorMessage('Lo sentimos, ha ocurrido un error al crear el investigador.')
             handleOpenError();
         }
     };
@@ -248,32 +258,7 @@ export default function AdminModal({ onSuccess }) {
                 </Box>
             </Modal>
 
-            <Modal
-                open={openError}
-                onClose={handleCloseError}
-                aria-labelledby="child-modal-title"
-                aria-describedby="child-modal-description"
-            >
-                <Box sx={{ ...styleModalChild }}>
-                    <Alert
-                        severity="error"
-                        action={
-                            <IconButton
-                                aria-label="close"
-                                color="inherit"
-                                size="small"
-                                onClick={() => {
-                                    handleCloseError();
-                                }}
-                            >
-                                <CloseIcon fontSize="inherit" />
-                            </IconButton>
-                        }
-                    >
-                        Lo sentimos, ha ocurrido un error.
-                    </Alert>
-                </Box>
-            </Modal>
+            <ErrorModal  openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage} />
         </div >
     );
 }

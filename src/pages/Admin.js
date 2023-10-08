@@ -69,7 +69,7 @@ const Admin = () => {
                         data={usersData}
                         columns={usersColumns}
                         options={{
-                            customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} />,
+                            customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} usersData={usersData}/>,
                             onRowsDelete: handleUserRowsDelete,
                             selectableRowsOnClick: true,
                         }}

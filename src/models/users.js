@@ -6,17 +6,24 @@ export const columns = [
     {
         name: "name",
         label: "Nombre",
+        options: {
+            filterType: 'textField',
+        }
     },
     {
         name: "email",
         label: "Correo",
+        options: {
+            filterType: 'textField',
+        }
     },
     {
         name: "is_active",
         label: "Activo",
         options: {
             customBodyRender: value => <CustomBodyCell value={!value} />,
-            sort: false
+            sort: false,
+            filter: false,
         }
     },
 ];

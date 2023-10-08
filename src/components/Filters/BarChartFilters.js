@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/system";
 import { styled } from '@mui/material/styles';
-import { MenuProps, disciplines, sexs, countries, academic_degrees, institutions } from "./utils/chartUtils";
+import { MenuProps, disciplines, sexs, countries, academic_degrees, institutions } from "../utils/chartUtils";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
