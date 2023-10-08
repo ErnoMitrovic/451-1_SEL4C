@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Button, Modal, Grid, FormControl, InputLabel, Input, FormHelperText, IconButton } from '@mui/material';
+import { Box, Typography, Button, Modal, Grid, FormControl, InputLabel, Input, FormHelperText, IconButton, Alert } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from "axios";
 import { getToken } from "../../models/token";
@@ -17,10 +17,36 @@ const styleModalAdmin = {
     borderRadius: '1rem',
 };
 
+const styleModalChild = {
+    position: 'absolute',
+    top: '20%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    boxShadow: 24,
+    borderRadius: '1rem',
+};
+
 export default function AdminModal({ onSuccess }) {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false)
+        setName('');
+        setEmail('');
+        setPassword('');
+        setPasswordConfirm('');
+    };
+
+    const [openSuccess, setOpenSuccess] = React.useState(false);
+    const handleOpenSuccess = () => setOpenSuccess(true);
+    const handleCloseSuccess = () => {
+        setOpenSuccess(false);
+        handleClose();
+    }
+
+    const [openError, setOpenError] = React.useState(false);
+    const handleOpenError = () => setOpenError(true);
+    const handleCloseError = () => setOpenError(false);
 
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
@@ -53,9 +79,9 @@ export default function AdminModal({ onSuccess }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Validate email and password
-        if (!isEmailValid() || !arePasswordsMatching()) {
+        if (!isEmailValid() || !arePasswordsMatching() || password.length < 5) {
             return;
         }
 
@@ -86,16 +112,19 @@ export default function AdminModal({ onSuccess }) {
             setPassword('');
             setPasswordConfirm('');
             // Close the modal after a successful request
-            handleClose();
-            alert('Investigador creado exitosamente');
+            handleOpenSuccess();
             // Pass the new user's data to the callback
             if (typeof onSuccess === "function") {
-                onSuccess(response.data);
+                const modifiedData = {
+                    ...response.data, // Copy the existing data
+                    "is_active": true, // Add the new field
+                };
+                onSuccess(modifiedData);
             }
         } catch (error) {
             // Handle errors, delete on production?
             console.error('Error:', error);
-            alert('Error al crear investigador');
+            handleOpenError();
         }
     };
 
@@ -134,6 +163,7 @@ export default function AdminModal({ onSuccess }) {
                                         id="name"
                                         aria-describedby="name-helper-text"
                                         type='text'
+                                        autoComplete="off"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                     />
@@ -146,6 +176,7 @@ export default function AdminModal({ onSuccess }) {
                                         id="email"
                                         aria-describedby="email-helper-text"
                                         type='text'
+                                        autoComplete="off"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
@@ -162,6 +193,10 @@ export default function AdminModal({ onSuccess }) {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
+                                    <FormHelperText id="pass-helper-text">{displayHelperTextPassword()}</FormHelperText>
+                                    {password.length > 0 && password.length < 5 && (
+                                        <FormHelperText error>La contraseña debe tener al menos 5 caracteres.</FormHelperText>
+                                    )}
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
@@ -184,6 +219,61 @@ export default function AdminModal({ onSuccess }) {
                     </form>
                 </Box>
             </Modal>
-        </div>
+
+
+            {/* Modals for success and error messages*/}
+            <Modal
+                open={openSuccess}
+                onClose={handleCloseSuccess}
+                aria-labelledby="child-modal-title"
+                aria-describedby="child-modal-description"
+            >
+                <Box sx={{ ...styleModalChild }}>
+                    <Alert
+                        action={
+                            <IconButton
+                                aria-label="close"
+                                color="inherit"
+                                size="small"
+                                onClick={() => {
+                                    handleCloseSuccess();
+                                }}
+                            >
+                                <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                        }
+                    >
+                        ¡Investigador creado exitosamente!
+                    </Alert>
+                </Box>
+            </Modal>
+
+            <Modal
+                open={openError}
+                onClose={handleCloseError}
+                aria-labelledby="child-modal-title"
+                aria-describedby="child-modal-description"
+            >
+                <Box sx={{ ...styleModalChild }}>
+                    <Alert
+                        severity="error"
+                        action={
+                            <IconButton
+                                aria-label="close"
+                                color="inherit"
+                                size="small"
+                                onClick={() => {
+                                    handleCloseError();
+                                }}
+                            >
+                                <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                        }
+                    >
+                        Lo sentimos, ha ocurrido un error.
+                    </Alert>
+                </Box>
+            </Modal>
+        </div >
     );
 }
