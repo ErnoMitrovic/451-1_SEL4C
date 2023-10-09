@@ -4,6 +4,7 @@ import { Sel4cCard } from "./Sel4cCard";
 import { createToken, isAdmin } from "../models/token";
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
+import ErrorModal from "./ErrorModal";
 
 export function FormsCard({ onLogin }) {
     const navigate = useNavigate();
@@ -12,6 +13,10 @@ export function FormsCard({ onLogin }) {
     const [email, setEmail] = React.useState('');
     // Track password
     const [password, setPassword] = React.useState('');
+    // Error feedback
+    const [openError, setOpenError] = React.useState(false);
+    const handleCloseError = () => setOpenError(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const setEmailError = (email) => {
         if (!email) return true;
@@ -47,12 +52,13 @@ export function FormsCard({ onLogin }) {
                         navigate('/');
                     } else {
                         cookies.remove('token');
-                        window.alert('Invalid email or password');
+                        setErrorMessage('Usuario o contraseña incorrectos');
+                        setOpenError(true);
                     }
                 })
                 .catch((error) => {
-                    window.alert('Invalid email or password');
-                    console.log(error);
+                    setErrorMessage('Usuario o contraseña incorrectos');
+                    setOpenError(true);
                 });
         }
     }
@@ -97,6 +103,7 @@ export function FormsCard({ onLogin }) {
                     <Button type="submit" variant="contained">Login</Button>
                 </Stack>
             </Stack>
+            <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage}/>
         </Sel4cCard>
     );
 }

@@ -52,6 +52,60 @@ const countries = [
     'México', 'Afganistán', 'Albania', 'Alemania', 'Algeria', 'Andorra', 'Angola', 'Anguilla', 'Antigua y Barbuda', 'Antillas Holandesas', 'Antártida', 'Arabia Saudita', 'Argentina', 'Armenia', 'Aruba', 'Australia', 'Austria', 'Azerbaiyán', 'Bahamas', 'Bahrein', 'Bangladesh', 'Barbados', 'Belice', 'Benín', 'Bermuda', 'Bielorrusia', 'Bolivia', 'Bosnia-Herzegovina', 'Botswana', 'Brasil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Bután', 'Bélgica', 'Cabo Verde', 'Camboya', 'Camerún', 'Canadá', 'Chad', 'Chile', 'China', 'Chipre', 'Colombia', 'Comores', 'Corea del Norte', 'Corea del Sur', 'Costa Rica', 'Costa de Marfíl', 'Croacia', 'Cuba', 'Dinamarca', 'Djibouti', 'Dominica', 'Ecuador', 'Egipto', 'El Salvador', 'Emiratos Árabes Unidos', 'Eritrea', 'Eslovaquía', 'Eslovenia', 'España', 'Estados Federados de Micronesia', 'Estados Unidos', 'Estonia', 'Etiopía', 'Fiji', 'Filipinas', 'Finlandia', 'Francia', 'Gabón', 'Gambia', 'Georgia', 'Ghana', 'Gibraltar', 'Granada', 'Grecia', 'Groenlandia', 'Guadalupe', 'Guam', 'Guatemala', 'Guinea', 'Guinea Ecuatorial', 'Guinea-Bissau', 'Guyana', 'Guyana Francesa', 'Haití', 'Holanda', 'Honduras', 'Hong Kong', 'Hungría', 'India', 'Indonesia', 'Iraq', 'Irlanda', 'Irán', 'Isla de Navidad', 'Islandia', 'Islas Caimán', 'Islas Cocos', 'Islas Cook', 'Islas Feroe', 'Islas Malvinas', 'Islas Marianas del Norte', 'Islas Marshall', 'Islas Norfolk', 'Islas Salomón', 'Islas Turcas y Caicos', 'Islas Vírgenes Americanas', 'Islas Vírgenes Británicas', 'Israel', 'Italia', 'Jamaica', 'Japón', 'Jordania', 'Kazajstán', 'Kenia', 'Kirguistán', 'Kiribati', 'Kuwait', 'Laos', 'Lesotho', 'Letonia', 'Liberia', 'Libia', 'Liechtenstein', 'Lituania', 'Luxemburgo', 'Líbano', 'Macao', 'Macedonia', 'Madagascar', 'Malasia', 'Malawi', 'Maldivas', 'Mali', 'Malta', 'Marruecos', 'Martinica', 'Mauricio', 'Mauritania', 'Mayotte', 'Moldavia', 'Mongolia', 'Montserrat', 'Mozambique', 'Myanmar', 'Mónaco', 'Namibia', 'Nauru', 'Nepal', 'Nicaragua', 'Niger', 'Nigeria', 'Niue', 'Noruega', 'Nueva Caledonia', 'Nueva Zelanda', 'Omán', 'Pakistán', 'Palau', 'Palestina', 'Panamá', 'Papua Nueva Guinea', 'Paraguay', 'Perú', 'Pitcairn', 'Polinesia Francesa', 'Polonia', 'Portugal', 'Puerto Rico', 'Qatar', 'Reino Unido', 'República Centroafricana', 'República Checa', 'República Democrática del Congo', 'República Dominicana', 'República del Congo', 'Reunión', 'Ruanda', 'Rumanía', 'Rusia', 'Samoa', 'Samoa Americana', 'San Kitts y Nevis', 'San Marino', 'San Vicente y Granadinas', 'Santa Helena', 'Santa Lucía', 'Santo Tomé y Príncipe', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leona', 'Singapur', 'Siria', 'Somalia', 'Sri Lanka', 'Sudáfrica', 'Sudán', 'Suecia', 'Suiza', 'Surinam', 'Swazilandia', 'Sáhara Occidental', 'Tadjikistan', 'Tailandia', 'Taiwán', 'Tanzania', 'Tierras Australes y Antárticas Francesas', 'Timor Oriental', 'Togo', 'Tokelau', 'Tonga', 'Trinidad y Tobago', 'Turkmenistan', 'Turquía', 'Tuvalu', 'Túnez', 'Ucrania', 'Uganda', 'Uruguay', 'Uzbekistán', 'Vanuatu', 'Vaticano', 'Venezuela', 'Vietnam', 'Wallis y Futuna', 'Yemen', 'Zambia', 'Zimbabwe'
 ];
 
+const initialBlankData = {
+    labels: [
+        'Innovación social y sostenibilidad financiera',
+        'Conciencia y valor social',
+        'Liderazgo',
+        'Autocontrol',
+        'Pensamiento sistémico',
+        'Pensamiento científico',
+        'Pensamiento crítico',
+        'Pensamiento innovador',
+    ],
+    datasets: [{
+        label: 'Masculino',
+        data: [],
+        fill: true,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgb(54, 162, 235)',
+        pointBackgroundColor: 'rgb(54, 162, 235)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(54, 162, 235)'
+    }, {
+        label: 'Femenino',
+        data: [],
+        fill: true,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgb(255, 99, 132)',
+        pointBackgroundColor: 'rgb(255, 99, 132)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(255, 99, 132)'
+    }, {
+        label: 'No binarie',
+        data: [],
+        fill: true,
+        backgroundColor: 'rgba(0, 194, 0, 0.2)',
+        borderColor: 'rgb(0, 194, 0)',
+        pointBackgroundColor: 'rgb(0, 194, 0)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 194, 0)'
+    }, {
+        label: 'Prefiero no decir',
+        data: [],
+        fill: true,
+        backgroundColor: 'rgba(255, 255, 0, 0.2)',
+        borderColor: 'rgb(255, 255, 0)',
+        pointBackgroundColor: 'rgb(255, 255, 0)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(255, 255, 0)'
+    }]
+};
+
 async function fetchData() {
     const token = getToken();
 
@@ -133,5 +187,5 @@ function calculateAverage(data, initialOrFinal) {
     return averageScores;
 }
 
-export { MenuProps, sexs, academic_degrees, institutions, disciplines, countries,
+export { MenuProps, sexs, academic_degrees, institutions, disciplines, countries, initialBlankData,
     fetchData, filterData, average, calculateAverage };

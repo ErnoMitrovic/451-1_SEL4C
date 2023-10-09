@@ -34,6 +34,7 @@ export default function ErrorModal({ openError, handleCloseError, errorMessage }
                             <CloseIcon fontSize="inherit" />
                         </IconButton>
                     }
+                    autoFocus={false}
                 >
                     {errorMessage}
                 </Alert>

@@ -6,106 +6,59 @@ import { RadarChart } from '../components/Charts/RadarChart';
 import { BarChart } from '../components/Charts/BarChart';
 import { RadarChartFilters } from '../components/Filters/RadarChartFilters';
 import { BarChartFilters } from '../components/Filters/BarChartFilters';
-import { fetchData, filterData, calculateAverage } from '../components/utils/chartUtils';
+import { fetchData, filterData, calculateAverage, initialBlankData } from '../components/utils/chartUtils';
 import * as XLSX from "xlsx";
 import { FilterList, TableChartOutlined } from '@mui/icons-material';
 import { Stack, Modal, Container, IconButton } from '@mui/material';
+import ErrorModal from '../components/ErrorModal';
 
 export default function MetricsPanel() {
 
+    // Fetch the data from the API; store full data in fetchedData and filtered data in filteredData
     const [fetchedData, setFetchedData] = React.useState({});
-    const [filteredData, setFilteredData] = React.useState({});    
+    const [filteredData, setFilteredData] = React.useState({});
 
     // Update the radar chart data. 
     // filteredRadarData is the data that will be displayed in the chart stored in JSON.
     const [filteredRadarData, setFilteredRadarData] = React.useState(filteredData);
-    const [radarData, setRadarData] = React.useState({
-        labels: [
-            'Innovación social y sostenibilidad financiera',
-            'Conciencia y valor social',
-            'Liderazgo',
-            'Autocontrol',
-            'Pensamiento sistémico',
-            'Pensamiento científico',
-            'Pensamiento crítico',
-            'Pensamiento innovador',
-        ],
-        datasets: [{
-            label: 'Masculino',
-            data: [],
-            fill: true,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgb(54, 162, 235)',
-            pointBackgroundColor: 'rgb(54, 162, 235)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(54, 162, 235)'
-        }, {
-            label: 'Femenino',
-            data: [],
-            fill: true,
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgb(255, 99, 132)',
-            pointBackgroundColor: 'rgb(255, 99, 132)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(255, 99, 132)'
-        }, {
-            label: 'No binarie',
-            data: [],
-            fill: true,
-            backgroundColor: 'rgba(0, 194, 0, 0.2)',
-            borderColor: 'rgb(0, 194, 0)',
-            pointBackgroundColor: 'rgb(0, 194, 0)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(0, 194, 0)'
-        }, {
-            label: 'Prefiero no decir',
-            data: [],
-            fill: true,
-            backgroundColor: 'rgba(255, 255, 0, 0.2)',
-            borderColor: 'rgb(255, 255, 0)',
-            pointBackgroundColor: 'rgb(255, 255, 0)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(255, 255, 0)'
-        }]
-    });
-    
+    const [radarData, setRadarData] = React.useState(initialBlankData);
+
+    const [openError, setOpenError] = React.useState(false);
+    const handleCloseError = () => setOpenError(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
+
+    // Excel functions
     function transformItem(item) {
-        console.log(item);
         // Flatten the 'initial' and 'final' objects
         const transformedItem = {
-            id: item.id,
-            full_name: item.full_name,
+            user: item.user,
+            discipline: item.discipline,
             academic_degree: item.academic_degree,
             institution: item.institution,
             gender: item.gender,
             age: item.age,
             country: item.country,
-            discipline: item.discipline,
-            user: item.user,
         };
 
         // Append `initial_` to the keys of the initial object
         for (const key in item.initial_score) {
-            if (item.initial.hasOwnProperty(key)) {
+            if (item.initial_score.hasOwnProperty(key) && key !== 'id' && key !== 'user') {
                 transformedItem[`initial_score_${key}`] = item.initial_score[key];
             }
         }
 
-        // Append `final_` to the keys of the final object
-        for (const key in item.final_score) {
-            if (item.initial.hasOwnProperty(key)) {
-                transformedItem[`final_score_${key}`] = item.final_score[key];
+        // Check if final_score is not 0 and append `final_` to the keys of the final object
+        if (item.final_score !== 0) {
+            for (const key in item.final_score) {
+                if (item.final_score.hasOwnProperty(key) && key !== 'id' && key !== 'user') {
+                    transformedItem[`final_score_${key}`] = item.final_score[key];
+                }
             }
         }
 
-        return {
-            ...transformedItem,
-        };
+        return transformedItem;
     }
+
 
     const [filteredDataFromModal, setFilteredDataFromModal] = React.useState(
         {
@@ -123,6 +76,7 @@ export default function MetricsPanel() {
     }
 
     function downloadExcel(data) {
+        console.log('Excel call', data);
         const transformedData = transformData(data);
         const worksheet = XLSX.utils.json_to_sheet(transformedData);
         const workbook = XLSX.utils.book_new();
@@ -138,80 +92,85 @@ export default function MetricsPanel() {
 
     React.useEffect(() => {
         const init = async () => {
-            const fetchedData = await fetchData();
-            //const fetchedData = users;
-            setFetchedData(fetchedData);
-            var filters = {
-                sex: ['Masculino', 'Femenino', 'No binarie', 'Prefiero no decir'],
-                disciplines: ['Arquitectura, Arte y Diseño', 'Ciencias Sociales', 'Ciencias de la Salud', 'Humanidades y Educación', 'Ingeniería y Ciencias', 'Negocios'],
-                countries: ['México'],
-                academic_degrees: ['Pregrado', 'Posgrado', 'Educación Continua'],
-                institutions: ['Tecnológico de Monterrey', 'Otros'],
-                age: [18, 45],
-            };
-            const filteredData = filterData(filters, fetchedData);
-            setFilteredData(filteredData);
-            filters['sex'] = ['Masculino']
-            const masculineData = calculateAverage(filterData(filters, filteredData), 'final_score');
-            filters['sex'] = ['Femenino']
-            const femenineData = calculateAverage(filterData(filters, filteredData), 'final_score');
-            filters['sex'] = ['No binarie']
-            const nonBinaryData = calculateAverage(filterData(filters, filteredData), 'final_score');
-            filters['sex'] = ['Prefiero no decir']
-            const noSexResponseData = calculateAverage(filterData(filters, filteredData), 'final_score');
-            setRadarData({
-                labels: [
-                    'Innovación social y sostenibilidad financiera',
-                    'Conciencia y valor social',
-                    'Liderazgo',
-                    'Autocontrol',
-                    'Pensamiento sistémico',
-                    'Pensamiento científico',
-                    'Pensamiento crítico',
-                    'Pensamiento innovador',
-                ],
-                datasets: [{
-                    label: 'Masculino',
-                    data: masculineData,
-                    fill: true,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgb(54, 162, 235)',
-                    pointBackgroundColor: 'rgb(54, 162, 235)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(54, 162, 235)'
-                }, {
-                    label: 'Femenino',
-                    data: femenineData,
-                    fill: true,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    pointBackgroundColor: 'rgb(255, 99, 132)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(255, 99, 132)'
-                }, {
-                    label: 'No binarie',
-                    data: nonBinaryData,
-                    fill: true,
-                    backgroundColor: 'rgba(0, 194, 0, 0.2)',
-                    borderColor: 'rgb(0, 194, 0)',
-                    pointBackgroundColor: 'rgb(0, 194, 0)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(0, 194, 0)'
-                }, {
-                    label: 'Prefiero no decir',
-                    data: noSexResponseData,
-                    fill: true,
-                    backgroundColor: 'rgba(255, 255, 0, 0.2)',
-                    borderColor: 'rgb(255, 255, 0)',
-                    pointBackgroundColor: 'rgb(255, 255, 0)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(255, 255, 0)'
-                }]
-            });
+            try {
+                const fetchedData = await fetchData();
+                setFetchedData(fetchedData);
+                var filters = {
+                    sex: ['Masculino', 'Femenino', 'No binarie', 'Prefiero no decir'],
+                    disciplines: ['Arquitectura, Arte y Diseño', 'Ciencias Sociales', 'Ciencias de la Salud', 'Humanidades y Educación', 'Ingeniería y Ciencias', 'Negocios'],
+                    countries: ['México'],
+                    academic_degrees: ['Pregrado', 'Posgrado', 'Educación Continua'],
+                    institutions: ['Tecnológico de Monterrey', 'Otros'],
+                    age: [18, 45],
+                };
+                const filteredData = filterData(filters, fetchedData);
+                setFilteredData(filteredData);
+                setFilteredRadarData(filteredData);
+                filters['sex'] = ['Masculino']
+                const masculineData = calculateAverage(filterData(filters, filteredData), 'final_score');
+                filters['sex'] = ['Femenino']
+                const femenineData = calculateAverage(filterData(filters, filteredData), 'final_score');
+                filters['sex'] = ['No binarie']
+                const nonBinaryData = calculateAverage(filterData(filters, filteredData), 'final_score');
+                filters['sex'] = ['Prefiero no decir']
+                const noSexResponseData = calculateAverage(filterData(filters, filteredData), 'final_score');
+                setRadarData({
+                    labels: [
+                        'Innovación social y sostenibilidad financiera',
+                        'Conciencia y valor social',
+                        'Liderazgo',
+                        'Autocontrol',
+                        'Pensamiento sistémico',
+                        'Pensamiento científico',
+                        'Pensamiento crítico',
+                        'Pensamiento innovador',
+                    ],
+                    datasets: [{
+                        label: 'Masculino',
+                        data: masculineData,
+                        fill: true,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(54, 162, 235)'
+                    }, {
+                        label: 'Femenino',
+                        data: femenineData,
+                        fill: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    }, {
+                        label: 'No binarie',
+                        data: nonBinaryData,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 194, 0, 0.2)',
+                        borderColor: 'rgb(0, 194, 0)',
+                        pointBackgroundColor: 'rgb(0, 194, 0)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(0, 194, 0)'
+                    }, {
+                        label: 'Prefiero no decir',
+                        data: noSexResponseData,
+                        fill: true,
+                        backgroundColor: 'rgba(255, 255, 0, 0.2)',
+                        borderColor: 'rgb(255, 255, 0)',
+                        pointBackgroundColor: 'rgb(255, 255, 0)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 255, 0)'
+                    }]
+                });
+            } catch (error) {
+                setErrorMessage('Error al cargar los datos');
+                setOpenError(true);
+            }
         };
         init();
     }, []);
@@ -274,6 +233,7 @@ export default function MetricsPanel() {
                 <Box className='hide-on-small' sx={{ bgcolor: '#D9D9D9', width: '0.5rem', height: '34rem' }} />
                 <BarChartFilters />
             </Sel4cCard>
+            <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage}/>
         </div >
     );
 }

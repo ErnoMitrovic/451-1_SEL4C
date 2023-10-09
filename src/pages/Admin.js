@@ -5,11 +5,19 @@ import AdminModal from "../components/Admin/AdminModal";
 import { columns as usersColumns, getData as getUsers, deleteData as deleteUser } from "../models/users";
 import { formResponseColumns, getData as getFormResponses } from "../models/forms";
 import { activitiesColumns } from "../models/activities";
+import ErrorModal from "../components/ErrorModal";
 
 const Admin = () => {
+    // Track users data
     const [usersData, setUsersData] = React.useState([]);
+    // Track form responses data
     const [formResponseData, setFormResponseData] = React.useState([]);
+    // Track activities data
     const [activitiesData, setActivitiesData] = React.useState([]);
+    // Error feedback
+    const [openError, setOpenError] = React.useState(false);
+    const handleCloseError = () => setOpenError(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -22,7 +30,8 @@ const Admin = () => {
                 //setActivitiesData(activitiesData);
             } catch (error) {
                 // Handle errors, e.g., show an error message
-                console.error('Error:', error);
+                setErrorMessage('Error al cargar datos');
+                setOpenError(true);
             }
         };
 
@@ -69,7 +78,7 @@ const Admin = () => {
                         data={usersData}
                         columns={usersColumns}
                         options={{
-                            customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} usersData={usersData}/>,
+                            customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} usersData={usersData} />,
                             onRowsDelete: handleUserRowsDelete,
                             selectableRowsOnClick: true,
                         }}
@@ -85,6 +94,7 @@ const Admin = () => {
                         columns={activitiesColumns}
                     />
                 </Box>
+                <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
             </div>
         </div>
     );
