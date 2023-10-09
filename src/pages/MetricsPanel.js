@@ -1,13 +1,11 @@
 import './MetricsPanel.sass';
 import React from 'react';
-import Box from '@mui/material/Box';
 import { Sel4cCard } from '../components/Sel4cCard';
 import { RadarChart } from '../components/Charts/RadarChart';
 import { BarChart } from '../components/Charts/BarChart';
 import { RadarChartFilters } from '../components/Filters/RadarChartFilters';
 import { BarChartFilters } from '../components/Filters/BarChartFilters';
-import { fetchData, filterData, calculateAverage, initialBlankData } from '../components/utils/chartUtils';
-import * as XLSX from "xlsx";
+import { fetchData, filterData, calculateAverage, initialBlankRadarData, initialBlankBarData, softColors, colors, downloadExcel } from '../components/utils/chartUtils';
 import { FilterList, TableChartOutlined } from '@mui/icons-material';
 import { Stack, Modal, Container, IconButton } from '@mui/material';
 import ErrorModal from '../components/ErrorModal';
@@ -16,50 +14,25 @@ export default function MetricsPanel() {
 
     // Fetch the data from the API; store full data in fetchedData and filtered data in filteredData
     const [fetchedData, setFetchedData] = React.useState({});
+    // filteredData is the filtered data from any modal interaction that will be displayed in the charts stored in JSON.
     const [filteredData, setFilteredData] = React.useState({});
 
     // Update the radar chart data. 
-    // filteredRadarData is the data that will be displayed in the chart stored in JSON.
+    // radarData is the data formatted for the chart.js.
+    const [radarData, setRadarData] = React.useState(initialBlankRadarData);
     const [filteredRadarData, setFilteredRadarData] = React.useState(filteredData);
-    const [radarData, setRadarData] = React.useState(initialBlankData);
 
+    // Update the bar chart data.
+    // barData is the data formatted for the chart.js.
+    const [barData, setBarData] = React.useState(initialBlankBarData);
+    const [filteredBarData, setFilteredBarData] = React.useState(filteredData);
+
+    // Error handling
     const [openError, setOpenError] = React.useState(false);
     const handleCloseError = () => setOpenError(false);
     const [errorMessage, setErrorMessage] = React.useState('');
 
-    // Excel functions
-    function transformItem(item) {
-        // Flatten the 'initial' and 'final' objects
-        const transformedItem = {
-            user: item.user,
-            discipline: item.discipline,
-            academic_degree: item.academic_degree,
-            institution: item.institution,
-            gender: item.gender,
-            age: item.age,
-            country: item.country,
-        };
-
-        // Append `initial_` to the keys of the initial object
-        for (const key in item.initial_score) {
-            if (item.initial_score.hasOwnProperty(key) && key !== 'id' && key !== 'user') {
-                transformedItem[`initial_score_${key}`] = item.initial_score[key];
-            }
-        }
-
-        // Check if final_score is not 0 and append `final_` to the keys of the final object
-        if (item.final_score !== 0) {
-            for (const key in item.final_score) {
-                if (item.final_score.hasOwnProperty(key) && key !== 'id' && key !== 'user') {
-                    transformedItem[`final_score_${key}`] = item.final_score[key];
-                }
-            }
-        }
-
-        return transformedItem;
-    }
-
-
+    // Selected filters - initial filters are set for the first time the page is loaded
     const [filteredDataFromModal, setFilteredDataFromModal] = React.useState(
         {
             sex: ['Masculino', 'Femenino', 'No binarie', 'Prefiero no decir'],
@@ -69,30 +42,12 @@ export default function MetricsPanel() {
             institutions: ['Tecnológico de Monterrey', 'Otros'],
             age: [18, 45],
         });
-
-    function transformData(data) {
-        // Use .map to transform each item in the data array
-        return data.map(transformItem);
-    }
-
-    function downloadExcel(data) {
-        console.log('Excel call', data);
-        const transformedData = transformData(data);
-        const worksheet = XLSX.utils.json_to_sheet(transformedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-        //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
-        //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
-        XLSX.writeFile(workbook, "DataSheet.xlsx");
-    };
-
-    const updateRadarData = (newData) => {
-        setRadarData(newData);
-    };
+    const [filteredBarDataFromModal, setFilteredBarDataFromModal] = React.useState(filteredDataFromModal);
 
     React.useEffect(() => {
         const init = async () => {
             try {
+                // Fetch the data from the API and set the full raw gathered data and the on-load filtered data
                 const fetchedData = await fetchData();
                 setFetchedData(fetchedData);
                 var filters = {
@@ -106,6 +61,34 @@ export default function MetricsPanel() {
                 const filteredData = filterData(filters, fetchedData);
                 setFilteredData(filteredData);
                 setFilteredRadarData(filteredData);
+                setFilteredBarData(filteredData);
+
+                // Filter and set the bar chart data
+                const initialScores = calculateAverage(filteredData, 'initial_score');
+                const finalScores = calculateAverage(filteredData, 'final_score');
+                setBarData({
+                    labels: [
+                        ['Innovación', 'social y', 'sostenibilidad', 'financiera'],
+                        ['Conciencia', 'y valor', 'social'],
+                        'Liderazgo',
+                        'Autocontrol',
+                        ['Pensamiento', 'sistémico'],
+                        ['Pensamiento', 'científico'],
+                        ['Pensamiento', 'crítico'],
+                        ['Pensamiento', 'innovador'],
+                    ],
+                    datasets: [{
+                        label: 'Formulario Inicial',
+                        data: initialScores,
+                        backgroundColor: softColors,
+                    }, {
+                        label: 'Formulario Final',
+                        data: finalScores,
+                        backgroundColor: colors,
+                    }]
+                });
+
+                // Filter and set the radar chart data
                 filters['sex'] = ['Masculino']
                 const masculineData = calculateAverage(filterData(filters, filteredData), 'final_score');
                 filters['sex'] = ['Femenino']
@@ -175,11 +158,17 @@ export default function MetricsPanel() {
         init();
     }, []);
 
+    // Filters modals
     const [openModal, setOpenModal] = React.useState(false);
+    const [openBarModal, setOpenBarModal] = React.useState(false);
 
     function handleCloseModal() {
-        updateRadarData(radarData);
+        setRadarData(radarData);
         setOpenModal(false);
+    }
+    function handleCloseBarModal() {
+        setBarData(barData);
+        setOpenBarModal(false);
     }
 
     return (
@@ -212,28 +201,47 @@ export default function MetricsPanel() {
                 }}>
                     <RadarChartFilters
                         fetchedData={fetchedData}
-                        updateRadarData={updateRadarData}
-                        setFilteredRadarData={setFilteredRadarData}
+                        updateRadarData={setRadarData}
+                        setFilteredData={setFilteredRadarData}
                         onFiltersChange={setFilteredDataFromModal}
                         currentFilters={filteredDataFromModal} />
                 </Container>
             </Modal>
             <Sel4cCard>
-                <Box sx={{
+                <Stack maxWidth={1} width='100%'>
+                    <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
+                        <IconButton
+                            onClick={() => {
+                                downloadExcel(filteredBarData);
+                            }}>
+                            <TableChartOutlined color='#1d6f42' />
+                        </IconButton>
+                        <IconButton onClick={() => setOpenBarModal(true)}>
+                            <FilterList />
+                        </IconButton>
+                    </Stack>
+                    <BarChart data={barData} />
+                </Stack>
+            </Sel4cCard>
+            <Modal open={openBarModal} onClose={handleCloseBarModal}>
+                <Container sx={{
+                    bgcolor: 'background.paper',
+                    border: '4px solid #000',
+                    boxShadow: 24,
+                    p: 2,
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    flexWrap: 'wrap',
-                    flexGrow: 1,
                 }}>
-                    <BarChart />
-                    <BarChart />
-                </Box>
-                <Box className='hide-on-small' sx={{ bgcolor: '#D9D9D9', width: '0.5rem', height: '34rem' }} />
-                <BarChartFilters />
-            </Sel4cCard>
-            <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage}/>
+                    <BarChartFilters
+                        fetchedData={fetchedData}
+                        updateBarData={setBarData}
+                        setFilteredData={setFilteredBarData}
+                        onFiltersChange={setFilteredBarDataFromModal}
+                        currentFilters={filteredBarDataFromModal} />
+                </Container>
+            </Modal>
+            <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage} />
         </div >
     );
 }

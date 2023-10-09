@@ -16,7 +16,7 @@ width: 42px;
 `;
 
 
-export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredRadarData, onFiltersChange, currentFilters }) {
+export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredData, onFiltersChange, currentFilters }) {
 
     const [selectedSexs, setSelectedSexs] = React.useState(
         currentFilters.sex
@@ -231,7 +231,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredRad
                 pointHoverBorderColor: 'rgb(255, 255, 0)'
             }]
         }
-        setFilteredRadarData(jsonData);
+        setFilteredData(jsonData);
         updateRadarData(newData);
     };
 
@@ -246,7 +246,7 @@ export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredRad
         }
         onFiltersChange(currentFilters);
         handleUpdateRadarData();
-    }, [selectedSexs, selectedDisciplines, selectedCountries, selectedAcademicDegrees, selectedInstitutions, selectedAge, initialOrFinal]);
+    }, [selectedSexs, selectedDisciplines, selectedCountries, selectedAcademicDegrees, selectedInstitutions, selectedAge, initialOrFinal, onFiltersChange, handleUpdateRadarData]);
 
     return (
         <Grid container sx={{
