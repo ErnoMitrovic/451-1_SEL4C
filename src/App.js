@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import MetricsPanel from './pages/MetricsPanel';
 import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
+import ForgetPasswordSendEmail from './pages/ForgetPasswordSendEmail';
 import { Navibar } from './components/Navibar';
 import { removeToken, isAdmin } from './models/token';
 
@@ -62,6 +63,10 @@ function App() {
                     path="login"
                     element={<Login onLogin={onLogin} />}
                 />
+                <Route
+                    path="forgetPassword"
+                    element={
+                    !isAuthenticated && (<ForgetPasswordSendEmail />)} />
                 <Route
                     path="profile"
                     element={

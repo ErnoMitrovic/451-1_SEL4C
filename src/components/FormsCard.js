@@ -1,9 +1,9 @@
 import { Stack, Typography, Input, FormControl, InputLabel, FormHelperText, Button } from "@mui/material";
 import React from "react";
 import { Sel4cCard } from "./Sel4cCard";
-import { createToken, isAdmin } from "../models/token";
+import { createToken, getToken, isAdmin } from "../models/token";
 import Cookies from 'universal-cookie';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function FormsCard({ onLogin }) {
     const navigate = useNavigate();
@@ -40,6 +40,7 @@ export function FormsCard({ onLogin }) {
                     const cookies = new Cookies();
                     const token = response.data.token
                     cookies.set('token', token, { path: '/' });
+                    console.log("Token from cookie: " + getToken())
                     // Check if user is admin, if so, navigate to home page
                     // else, display error message
                     if (await isAdmin() === true) {
@@ -56,13 +57,12 @@ export function FormsCard({ onLogin }) {
                 });
         }
     }
-    
+
     return (
         <Sel4cCard>
             <Stack spacing={2} maxWidth='md'
                 m={2}
                 minWidth='xs'
-                borderColor='primary.main'
                 alignItems='center'>
                 <Typography variant="h2" align="center" sx={{ letterSpacing: 6 }} >
                     SEL4C
@@ -93,6 +93,9 @@ export function FormsCard({ onLogin }) {
                             error={!password}
                         />
                         <FormHelperText id="password-helper-text">{displayhelperTextPassword()}</FormHelperText>
+                        <Link to='/forgetPassword'>
+                            <Typography textAlign='right'>Forgot your password?</Typography>
+                        </Link>
                     </FormControl>
                     <Button type="submit" variant="contained">Login</Button>
                 </Stack>
