@@ -3,10 +3,16 @@ import React from "react";
 import Box from '@mui/material/Box';
 import ProfileUpdateModal from '../components/Profile/ProfileUpdateModal';
 import { getMe } from "../models/users";
+import ErrorModal from '../components/ErrorModal';
 
 export default function Profile() {
+    // Track user data
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
+    // Error feedback
+    const [openError, setOpenError] = React.useState(false);
+    const handleCloseError = () => setOpenError(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -16,7 +22,8 @@ export default function Profile() {
                 setEmail(meData.email);
             } catch (error) {
                 // Handle errors, e.g., show an error message
-                console.error('Error:', error);
+                setErrorMessage('Error al cargar datos');
+                setOpenError(true);
             }
         };
 
@@ -54,6 +61,7 @@ export default function Profile() {
                     Aqui deberia ir el link para recuperar contraseña
                 </div>
             </Box>
+            <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
         </div>
     );
 }

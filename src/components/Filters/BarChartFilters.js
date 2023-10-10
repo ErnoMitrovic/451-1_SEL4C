@@ -1,33 +1,26 @@
-import React from "react";
-import { Box } from "@mui/system";
+// React components.
+import React, { useEffect } from "react";
 import { styled } from '@mui/material/styles';
-import { MenuProps, disciplines, sexs, countries, academic_degrees, institutions } from "../utils/chartUtils";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import ListItemText from '@mui/material/ListItemText';
-import Select from '@mui/material/Select';
-import Checkbox from '@mui/material/Checkbox';
-import Typography from '@mui/material/Typography';
-import Slider from '@mui/material/Slider';
+import { Typography, Slider, Grid } from "@mui/material";
 import MuiInput from '@mui/material/Input';
-import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
+import Multiselect from "./Multiselect";
+
+// SEL4C custom data and functions.
+// Data.
+import { disciplines, sexs, academic_degrees, institutions, countries } from "../utils/chartUtils";
+// Functions.
+import { filterData, calculateAverage, softColors, colors } from "../utils/chartUtils";
 
 const Input = styled(MuiInput)`
 width: 42px;
 `;
 
-export function BarChartFilters() {
 
-    const [selectedSexs, setSelectedSexs] = React.useState([
-        'Masculino',
-        'Femenino',
-        'No binarie',
-        'Prefiero no decir'
-    ]);
+export function BarChartFilters({ fetchedData, updateBarData, setFilteredData, onFiltersChange, currentFilters }) {
+
+    const [selectedSexs, setSelectedSexs] = React.useState(
+        currentFilters.sex
+    );
     const isAllSelectedSexs = sexs.length > 0 && selectedSexs.length === sexs.length;
     const handleSexChange = (event) => {
         const value = event.target.value;
@@ -39,14 +32,9 @@ export function BarChartFilters() {
     };
 
 
-    const [selectedDisciplines, setSelectedDisciplines] = React.useState([
-        'Arquitectura, Arte y Diseño',
-        'Ciencias Sociales',
-        'Ciencias de la Salud',
-        'Humanidades y Educación',
-        'Ingeniería y Ciencias',
-        'Negocios'
-    ]);
+    const [selectedDisciplines, setSelectedDisciplines] = React.useState(
+        currentFilters.disciplines
+    );
     const isAllSelectedDisciplines = disciplines.length > 0 && selectedDisciplines.length === disciplines.length;
     const handleChangeDisciplines = (event) => {
         const value = event.target.value;
@@ -58,7 +46,7 @@ export function BarChartFilters() {
     };
 
 
-    const [selectedCountries, setSelectedCountries] = React.useState(['México']);
+    const [selectedCountries, setSelectedCountries] = React.useState(currentFilters.countries);
     const isAllSelectedCountries = countries.length > 0 && selectedCountries.length === countries.length;
     const handleChangeCountry = (event) => {
         const value = event.target.value;
@@ -70,11 +58,7 @@ export function BarChartFilters() {
     };
 
 
-    const [selectedAcademicDegrees, setSelectedAcademicDegrees] = React.useState([
-        'Pregrado',
-        'Posgrado',
-        'Educación Continua'
-    ]);
+    const [selectedAcademicDegrees, setSelectedAcademicDegrees] = React.useState(currentFilters.academic_degrees);
     const isAllSelectedAcademicDegrees = academic_degrees.length > 0 && selectedAcademicDegrees.length === academic_degrees.length;
     const handleChangeAcademicDegrees = (event) => {
         const value = event.target.value;
@@ -86,10 +70,7 @@ export function BarChartFilters() {
     };
 
 
-    const [selectedInstitutions, setSelectedInstitutions] = React.useState([
-        'Tecnológico de Monterrey',
-        'Otros'
-    ]);
+    const [selectedInstitutions, setSelectedInstitutions] = React.useState(currentFilters.institutions);
     const isAllSelectedInstitutions = institutions.length > 0 && selectedInstitutions.length === institutions.length;
     const handleChangeInstitutions = (event) => {
         const value = event.target.value;
@@ -101,8 +82,8 @@ export function BarChartFilters() {
     };
 
 
-    const [selectedAge, setSelectedAge] = React.useState([18, 45]);
-    const handleAgeChange = (event, newValue) => {
+    const [selectedAge, setSelectedAge] = React.useState(currentFilters.age);
+    const handleAgeChange = (_, newValue) => {
         setSelectedAge(newValue);
     };
     const handleMinAgeInputChange = (event) => {
@@ -136,228 +117,134 @@ export function BarChartFilters() {
         }
     };
 
+    // Swtich to chose if the chart displays the initial or final average scores.
+    const [initialOrFinal, setInitialOrFinal] = React.useState(true);
+    const handleTestChange = (event) => {
+        setInitialOrFinal(event.target.checked);
+    };
+
+
+
+    const handleUpdateBarData = () => {
+
+        if (selectedSexs.length === 0) {
+            alert('Selecciona al menos un sexo');
+            return;
+        } else if (selectedDisciplines.length === 0) {
+            alert('Selecciona al menos una disciplina');
+            return;
+        } else if (selectedCountries.length === 0) {
+            alert('Selecciona al menos un país');
+            return;
+        } else if (selectedAcademicDegrees.length === 0) {
+            alert('Selecciona al menos un grado de estudios');
+            return;
+        } else if (selectedInstitutions.length === 0) {
+            alert('Selecciona al menos una institución');
+            return;
+        }
+
+        const filters = {
+            sex: selectedSexs,
+            disciplines: selectedDisciplines,
+            countries: selectedCountries,
+            academic_degrees: selectedAcademicDegrees,
+            institutions: selectedInstitutions,
+            age: selectedAge,
+        };
+
+        const jsonData = filterData(filters, fetchedData);
+
+        var initialScores = [];
+        var finalScores = [];
+
+        initialScores = calculateAverage(filterData(filters, jsonData), 'initial_score');
+        finalScores = calculateAverage(filterData(filters, jsonData), 'final_score');
+
+        var newData = {
+            labels: [
+                ['Innovación', 'social y', 'sostenibilidad', 'financiera'],
+                ['Conciencia', 'y valor', 'social'],
+                'Liderazgo',
+                'Autocontrol',
+                ['Pensamiento', 'sistémico'],
+                ['Pensamiento', 'científico'],
+                ['Pensamiento', 'crítico'],
+                ['Pensamiento', 'innovador'],
+            ],
+            datasets: [{
+                label: 'Formulario Inicial',
+                data: initialScores,
+                backgroundColor: softColors,
+            }, {
+                label: 'Formulario Final',
+                data: finalScores,
+                backgroundColor: colors,
+            }]
+        }
+        setFilteredData(jsonData);
+        updateBarData(newData);
+    };
+
+    useEffect(() => {
+        const currentFilters = {
+            sex: selectedSexs,
+            disciplines: selectedDisciplines,
+            countries: selectedCountries,
+            academic_degrees: selectedAcademicDegrees,
+            institutions: selectedInstitutions,
+            age: selectedAge,
+        }
+        onFiltersChange(currentFilters);
+        handleUpdateBarData();
+    }, [selectedSexs, selectedDisciplines, selectedCountries, selectedAcademicDegrees, selectedInstitutions, selectedAge, initialOrFinal]);
 
     return (
-        <Box sx={{
+        <Grid container sx={{
             className: 'reset-margins',
-            display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
             marginLeft: '2rem',
-            width: '30rem',
             maxWidth: '100%',
-            padding: '1rem',
+            padding: '2rem',
+            overflowY: 'scroll',
         }}>
-            <Typography variant='h6' sx={{ marginBottom: '1rem', color: 'gray' }}>Filtrar datos:</Typography>
 
 
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="sex-multiple-checkbox-label">Sexo</InputLabel>
-                <Select
-                    labelId="sex-multiple-checkbox-label"
-                    id="sex-multiple-checkbox"
-                    multiple
-                    value={selectedSexs}
-                    onChange={handleSexChange}
-                    input={<OutlinedInput label="Sexo" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedSexs}
-                                indeterminate={
-                                    selectedSexs.length > 0 && selectedSexs.length < sexs.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {sexs.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedSexs.indexOf(option) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={option} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            <Grid item xs={12}>
+                <Typography variant='h6' sx={{ textAlign: 'center', marginBottom: '1rem', color: 'gray' }}>Filtrar datos</Typography>
+            </Grid>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Sexos' selectedData={selectedSexs} isAllSelected={isAllSelectedSexs} handleChange={handleSexChange} options={sexs} />
+            </Grid>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Disciplinas' selectedData={selectedDisciplines} isAllSelected={isAllSelectedDisciplines} handleChange={handleChangeDisciplines} options={disciplines} />
+            </Grid>
 
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="discipline-multiple-checkbox-label">Disciplina</InputLabel>
-                <Select
-                    labelId="discipline-multiple-checkbox-label"
-                    id="discipline-multiple-checkbox"
-                    multiple
-                    value={selectedDisciplines}
-                    onChange={handleChangeDisciplines}
-                    input={<OutlinedInput label="Disciplina" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedDisciplines}
-                                indeterminate={
-                                    selectedDisciplines.length > 0 && selectedDisciplines.length < disciplines.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {disciplines.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedDisciplines.indexOf(option) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={option} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Países' selectedData={selectedCountries} isAllSelected={isAllSelectedCountries} handleChange={handleChangeCountry} options={countries} />
+            </Grid>
 
+            <Grid item xs={12} md={6} display='flex' justifyContent='center'>
+                <Multiselect identifier='Estudios' selectedData={selectedAcademicDegrees} isAllSelected={isAllSelectedAcademicDegrees} handleChange={handleChangeAcademicDegrees} options={academic_degrees} />
+            </Grid>
 
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="country-multiple-checkbox-label">País</InputLabel>
-                <Select
-                    labelId="country-multiple-checkbox-label"
-                    id="country-multiple-checkbox"
-                    multiple
-                    value={selectedCountries}
-                    onChange={handleChangeCountry}
-                    input={<OutlinedInput label="País" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedCountries}
-                                indeterminate={
-                                    selectedCountries.length > 0 && selectedCountries.length < countries.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {countries.map((country) => (
-                        <MenuItem key={country} value={country}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedCountries.indexOf(country) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={country} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            <Grid item xs={12} display='flex' justifyContent='center'>
+                <Multiselect identifier='Instituciones' selectedData={selectedInstitutions} isAllSelected={isAllSelectedInstitutions} handleChange={handleChangeInstitutions} options={institutions} />
+            </Grid>
 
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="academic-degree-multiple-checkbox-label">Grado Académico</InputLabel>
-                <Select
-                    labelId="academic-degree-multiple-checkbox-label"
-                    id="academic-degree-multiple-checkbox"
-                    multiple
-                    value={selectedAcademicDegrees}
-                    onChange={handleChangeAcademicDegrees}
-                    input={<OutlinedInput label="Grado Académico" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedAcademicDegrees}
-                                indeterminate={
-                                    selectedAcademicDegrees.length > 0 && selectedAcademicDegrees.length < academic_degrees.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {academic_degrees.map((academic_degree) => (
-                        <MenuItem key={academic_degree} value={academic_degree}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedAcademicDegrees.indexOf(academic_degree) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={academic_degree} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-
-            <FormControl sx={{ m: 1, width: 200 }}>
-                <InputLabel id="institution-multiple-checkbox-label">Institución</InputLabel>
-                <Select
-                    labelId="institution-multiple-checkbox-label"
-                    id="institution-multiple-checkbox"
-                    multiple
-                    value={selectedInstitutions}
-                    onChange={handleChangeInstitutions}
-                    input={<OutlinedInput label="Institución" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                >
-                    <MenuItem
-                        value="all"
-                    >
-                        <ListItemIcon>
-                            <Checkbox
-                                checked={isAllSelectedInstitutions}
-                                indeterminate={
-                                    selectedInstitutions.length > 0 && selectedInstitutions.length < institutions.length
-                                }
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary="Todos"
-                        />
-                    </MenuItem>
-                    {institutions.map((institution) => (
-                        <MenuItem key={institution} value={institution}>
-                            <ListItemIcon>
-                                <Checkbox checked={selectedInstitutions.indexOf(institution) > -1} />
-                            </ListItemIcon>
-                            <ListItemText primary={institution} />
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-
-            <Box sx={{
+            <Grid item xs={12} sx={{
                 width: 250,
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
                 margin: '2rem 0',
             }}>
                 <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Edad en años:</Typography>
-                <Grid container spacing={2} alignItems='center'>
+                <Grid container spacing={2} alignItems='center' display='flex' justifyContent='center'>
                     <Grid item xs={12} sm={5}>
                         <Slider
                             getAriaLabel={() => 'Rango de Edad'}
@@ -368,7 +255,7 @@ export function BarChartFilters() {
                             max={100}
                         />
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Input
                             value={selectedAge[0]}
                             size="small"
@@ -383,10 +270,10 @@ export function BarChartFilters() {
                             }}
                         />
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Typography variant='body1' sx={{ color: 'gray' }}>a</Typography>
                     </Grid>
-                    <Grid item xs={4} sm={2}>
+                    <Grid item xs={4} sm={2} display='flex' justifyContent='center'>
                         <Input
                             value={selectedAge[1]}
                             size="small"
@@ -402,20 +289,7 @@ export function BarChartFilters() {
                         />
                     </Grid>
                 </Grid>
-            </Box>
-
-
-            <Button variant="contained" sx={{ marginTop: '1rem' }}>Aplicar filtros</Button>
-
-
-            {/*
-            <Typography variant='h6' sx={{ marginBottom: '1rem', color: 'gray' }}>Filtros seleccionados:</Typography>
-            <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Sexo: {selectedSexs.join(', ')}</Typography>
-            <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Disciplinas: {selectedDisciplines.join(', ')}</Typography>
-            <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>País: {selectedCountries.join(', ')}</Typography>
-            <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Edad: {selectedAge[0]} a {selectedAge[1]} años</Typography>
-            <Typography variant='body1' sx={{ marginBottom: '1rem', color: 'gray' }}>Test: {initialOrFinal ? 'Posttest' : 'Pretest'}</Typography>
-            */}
-        </Box>
+            </Grid>
+        </Grid>
     );
 }

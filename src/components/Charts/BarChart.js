@@ -28,72 +28,23 @@ const options = {
         },
         title: {
             display: true,
-            text: 'Chart.js Bar Chart',
+            text: 'Razón de cambio en las competencias SEL4C',
+        },
+        tooltip: {
+            callbacks: {
+                title: (context) => {
+                    return context[0].label.replaceAll(',', ' ');
+                },
+            },
         },
     },
+    maintainAspectRatio: false,
 };
 
-export const data = {
-    labels: [
-        'Pregrado',
-        'Posgrado',
-        'Educación continua',
-    ],
-    datasets: [{
-        label: 'Autocontrol',
-        data: [31, 23, 30],
-        fill: true,
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgb(54, 162, 235)',
-    }, {
-        label: 'Liderazgo',
-        data: [28, 25, 29],
-        fill: true,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgb(255, 99, 132)',
-    }, {
-        label: 'Conciencia y valor social',
-        data: [32, 24, 28],
-        fill: true,
-        backgroundColor: 'rgba(0, 0, 110, 0.2)',
-        borderColor: 'rgb(0, 0, 110)',
-    }, {
-        label: 'Innovación social y sostenibilidad financiera',
-        data: [32, 24, 28],
-        fill: true,
-        backgroundColor: 'rgba(110, 0, 0, 0.2)',
-        borderColor: 'rgb(110, 0, 0)',
-    }, {
-        label: 'Pensamiento sistémico',
-        data: [32, 24, 28],
-        fill: true,
-        backgroundColor: 'rgba(0, 194, 200, 0.2)',
-        borderColor: 'rgb(0, 194, 200)',
-    }, {
-        label: 'Pensamiento científico',
-        data: [32, 24, 28],
-        fill: true,
-        backgroundColor: 'rgba(100, 30, 150, 0.2)',
-        borderColor: 'rgb(100, 30, 150)',
-    }, {
-        label: 'Pensamiento crítico',
-        data: [32, 24, 28],
-        fill: true,
-        backgroundColor: 'rgba(200, 194, 0, 0.2)',
-        borderColor: 'rgb(200, 194, 0)',
-    }, {
-        label: 'Pensamiento innovador',
-        data: [32, 24, 28],
-        fill: true,
-        backgroundColor: 'rgba(50, 194, 0, 0.2)',
-        borderColor: 'rgb(50, 194, 0)',
-    }]
-};
-
-export function BarChart(props) {
+export function BarChart({ data }) {
     return (
-        <Box sx={{ width: '30rem', maxWidth: '100%', padding: '2rem' }}>
-            <Bar data={data} options={options}/>
+        <Box sx={{ height: '30rem', width: '100%', maxWidth: '70rem', padding: '2rem' }}>
+            <Bar data={data} options={options} />
         </Box>
     );
 };

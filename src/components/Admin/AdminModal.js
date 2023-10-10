@@ -252,6 +252,7 @@ export default function AdminModal({ onSuccess, usersData }) {
                                 <CloseIcon fontSize="inherit" />
                             </IconButton>
                         }
+                        autoFocus={false}
                     >
                         ¡Investigador creado exitosamente!
                     </Alert>
