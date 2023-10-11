@@ -1,24 +1,21 @@
-# Use an official Node.js runtime as a parent image
 FROM node:18-alpine
 
-# Set the working directory to /app
-WORKDIR /app
+WORKDIR /app/
+COPY public/ /app/public
+COPY src/ /app/src
+COPY package.json /app/
+RUN npm install
 
-# Copy the package.json and yarn.lock files to the container
-COPY package.json yarn.lock ./
+ENV REACT_APP_API_BASE_URL=http://ec2-54-183-198-5.us-west-1.compute.amazonaws.com/
 
-# Install dependencies using Yarn
-RUN yarn install
+EXPOSE 3000
+CMD ["npm", "start"]
 
-# Copy the rest of the application code to the container
-COPY public ./public
-COPY src ./src
 
-# Build the application
-RUN yarn build
+# To build and run container
+# docker image build -t web-app:latest .
+# docker run -p 3000:3000 --name web-app  web-app:latest
 
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-COPY --from=build /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# To stop and remove
+# docker rm web-app
+# docker stop web-app
