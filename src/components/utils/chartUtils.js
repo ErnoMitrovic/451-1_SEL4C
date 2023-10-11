@@ -164,7 +164,7 @@ async function fetchData() {
     }
 
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${token}`
