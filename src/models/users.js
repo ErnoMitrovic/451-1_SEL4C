@@ -4,7 +4,7 @@ import CustomBodyCell from "../components/Admin/CustomBodyCell";
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL
 
-export const columns = [
+export const adminColumns = [
     {
         name: "name",
         label: "Nombre",
@@ -18,6 +18,55 @@ export const columns = [
         options: {
             filterType: 'textField',
         }
+    },
+    {
+        name: "is_active",
+        label: "Activo",
+        options: {
+            customBodyRender: value => <CustomBodyCell value={!value} />,
+            sort: false,
+            filter: false,
+        }
+    },
+];
+
+export const usersColumns = [
+    {
+        name: "full_name",
+        label: "Nombre",
+        options: {
+            filterType: 'textField',
+        }
+    },
+    {
+        name: "email",
+        label: "Correo",
+        options: {
+            filterType: 'textField',
+        }
+    },
+    {
+        name: "academic_degree",
+        label: "Grado Académico",
+    },
+    {
+        name: "institution",
+        label: "Institución",
+    },
+    {
+        name: "gender",
+        label: "Género",
+    },
+    {
+        name: "age",
+        label: "Edad",
+        options: {
+            filterType: 'textField',
+        }
+    },
+    {
+        name: "country",
+        label: "País",
     },
     {
         name: "is_active",
@@ -51,7 +100,28 @@ export async function getMe() {
     }
 }
 
-export async function getData() {
+// fetch raw charts data.
+export async function getUsers() {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error('No token found');
+    }
+
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all/`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw Error('Internal error');
+    }
+}
+
+export async function getAdmins() {
     const token = getToken();
 
     if (!token) {

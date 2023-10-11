@@ -1,34 +1,36 @@
-import React from 'react';
-import { AppBar, Box, Toolbar, IconButton, MenuItem, Menu } from '@mui/material';
+import React, { useState } from 'react';
+import { AppBar, Box, Toolbar, IconButton, MenuItem, Drawer, Divider, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PublicIcon from '@mui/icons-material/Public';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
 export function Navibar({ isAuthenticated, onLogout }) {
-    const [mainMenuAnchorEl, setMainMenuAnchorEl] = React.useState(null);
-    const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Added state for the drawer
     const navigate = useNavigate();
 
-    const handleMainMenu = (event) => {
-        setMainMenuAnchorEl(event.currentTarget);
-    };
-
-    const handleUserMenu = (event) => {
-        setUserMenuAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setMainMenuAnchorEl(null);
-        setUserMenuAnchorEl(null);
-    };
-
-    const handleMenuItemClick = (route) => {
-        if (typeof route === 'function') {
-            onLogout();
+    const handleMenuItemClick = (routeOrAction) => {
+        if (typeof routeOrAction === 'function') {
+            routeOrAction(); // Call the action (e.g., onLogout)
         } else {
-            navigate(route);
+            navigate(routeOrAction); // Navigate to the specified route
         }
-        handleClose();
+        closeDrawer(); // Close the drawer
+    };
+
+    // Function to open the drawer
+    const openDrawer = () => {
+        setIsDrawerOpen(true);
+    };
+
+    // Function to close the drawer
+    const closeDrawer = () => {
+        setIsDrawerOpen(false);
     };
 
     return (
@@ -40,29 +42,133 @@ export function Navibar({ isAuthenticated, onLogout }) {
                         edge="start"
                         color="inherit"
                         aria-label="menu"
-                        onClick={handleMainMenu}
+                        onClick={openDrawer} // Open the drawer when clicked
                         sx={{ mr: 2 }}
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Menu
-                        id="menu-appbar"
-                        anchorEl={mainMenuAnchorEl}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(mainMenuAnchorEl)}
-                        onClose={handleClose}
+                    <Drawer
+                        anchor="left"
+                        open={isDrawerOpen}
+                        onClose={closeDrawer} // Close the drawer when needed
                     >
-                        <MenuItem onClick={() => handleMenuItemClick('/')}>Panel de métricas</MenuItem>
-                        <MenuItem onClick={() => handleMenuItemClick('/admin')}>Usuarios y respuestas de actividades</MenuItem>
-                    </Menu>
+                        {isAuthenticated && (
+                            <div>
+                                {/* Global and individual metrics; data table view */}
+                                <MenuItem onClick={() => handleMenuItemClick('/')}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="account of current user"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick('/')}
+                                        color="inherit"
+                                    >
+                                        <PublicIcon />
+                                    </IconButton>
+                                    <Stack direction="column" spacing={0}>
+                                        <Typography variant="body2">Métricas</Typography>
+                                        <Typography variant="body2">globales</Typography>
+                                    </Stack>
+                                </MenuItem>
+                                <MenuItem onClick={() => handleMenuItemClick('/single')}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="account of current user"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick('/single')}
+                                        color="inherit"
+                                    >
+                                        <TravelExploreIcon />
+                                    </IconButton>
+                                    <Stack direction="column" spacing={0}>
+                                        <Typography variant="body2">Métricas</Typography>
+                                        <Typography variant="body2">individuales</Typography>
+                                    </Stack>
+                                </MenuItem>
+                                <MenuItem onClick={() => handleMenuItemClick('/tables')}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="account of current user"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick('/tables')}
+                                        color="inherit"
+                                    >
+                                        <TableChartOutlinedIcon />
+                                    </IconButton>
+                                    <Stack direction="column" spacing={0}>
+                                        <Typography variant="body2">Vista de</Typography>
+                                        <Typography variant="body2">tablas</Typography>
+                                    </Stack>
+                                </MenuItem>
+                                <Divider />
+                                {/* Admin view for managing administrators */}
+                                <MenuItem onClick={() => handleMenuItemClick('/admin')}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="account of current user"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick('/admin')}
+                                        color="inherit"
+                                    >
+                                        <ManageAccountsIcon />
+                                    </IconButton>
+                                    <Stack direction="column" spacing={0}>
+                                        <Typography variant="body2">Administrar</Typography>
+                                        <Typography variant="body2">investigadores</Typography>
+                                    </Stack>
+                                </MenuItem>
+                                {/* Profile view to read and update user properties */}
+                                <MenuItem onClick={() => handleMenuItemClick('/profile')}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="account of current user"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick('/profile')}
+                                        color="inherit"
+                                    >
+                                        <AccountCircle />
+                                    </IconButton>
+                                    <Typography variant="body2">Mi perfil</Typography>
+                                </MenuItem>
+                                <Divider />
+                                {/* Logout */}
+                                <MenuItem onClick={() => handleMenuItemClick(onLogout)}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="logout"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick(onLogout)}
+                                        color="inherit"
+                                    >
+                                        <LogoutIcon />
+                                    </IconButton>
+                                    <Typography variant="body2">Cerrar sesión</Typography>
+                                </MenuItem>
+                            </div>
+                        )} {!isAuthenticated && (
+                            <div>
+                                {/* Login view; default when not authenticated */}
+                                <MenuItem onClick={() => handleMenuItemClick('/login')}>
+                                    <IconButton
+                                        size="large"
+                                        aria-label="login"
+                                        aria-controls="menu-appbar"
+                                        aria-haspopup="true"
+                                        onClick={() => handleMenuItemClick('/login')}
+                                        color="inherit"
+                                    >
+                                        <LoginIcon />
+                                    </IconButton>
+                                </MenuItem>
+                            </div>
+                        )}
+                    </Drawer>
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -75,38 +181,6 @@ export function Navibar({ isAuthenticated, onLogout }) {
                             style={{ height: '4rem' }}
                         />
                     </Box>
-                    {isAuthenticated && (
-                        <div>
-                            <IconButton
-                                size="large"
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleUserMenu}
-                                color="inherit"
-                            >
-                                <AccountCircle />
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={userMenuAnchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(userMenuAnchorEl)}
-                                onClose={handleClose}
-                            >
-                                <MenuItem onClick={() => handleMenuItemClick('/profile')}>Profile</MenuItem>
-                                <MenuItem onClick={() => handleMenuItemClick(onLogout)}>Logout</MenuItem>
-                            </Menu>
-                        </div>
-                    )}
                 </Toolbar>
             </AppBar>
         </Box>
