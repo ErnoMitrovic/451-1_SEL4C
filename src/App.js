@@ -6,7 +6,7 @@ import Login from './pages/Login';
 import MetricsPanel from './pages/MetricsPanel';
 import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
-import ForgetPasswordSendEmail from './pages/ForgetPasswordSendEmail';
+import ForgetPasswordSendEmail from './pages/user_auth/ForgetPasswordSendEmail';
 import { Navibar } from './components/Navibar';
 import { removeToken, isAdmin } from './models/token';
 
