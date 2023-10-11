@@ -2,6 +2,8 @@ import axios from "axios";
 import { getToken } from "./token";
 import CustomBodyCell from "../components/Admin/CustomBodyCell";
 
+const BASE_URL = process.env.REACT_APP_API_BASE_URL
+
 export const columns = [
     {
         name: "name",
@@ -36,7 +38,7 @@ export async function getMe() {
     }
 
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/me/`, {
+        const response = await axios.get(`${BASE_URL}sel4c/user/me/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${token}`
@@ -62,7 +64,7 @@ export async function getData() {
     };
 
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/admin/info/all/`, { headers: headers });
+        const response = await axios.get(`${BASE_URL}sel4c/user/admin/info/all/`, { headers: headers });
         return response.data;
     } catch (error) {
         throw new Error('Internal error');
@@ -82,10 +84,23 @@ export async function deleteData(id) {
     };
 
     try {
-        await axios.delete(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/deactivate/${id}/`, { headers: headers });
+        await axios.delete(`${BASE_URL}sel4c/user/deactivate/${id}/`, { headers: headers });
         return;
     } catch (error) {
         throw new Error('Internal error');
     };
 
 };
+
+export async function resetPassword(email){
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+
+    try {
+        await axios.post(`${BASE_URL}sel4c/user/reset-password/`, {email: email}, { headers: headers });
+        return;
+    } catch (error) {
+        throw new Error('Internal error');
+    };
+}
