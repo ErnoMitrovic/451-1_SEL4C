@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import MetricsPanel from './pages/MetricsPanel';
 import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
+import SingleMetrics from './pages/SingleMetrics';
+import TableView from './pages/TableView';
 import { Navibar } from './components/Navibar';
 import { removeToken, isAdmin } from './models/token';
 
@@ -35,6 +37,7 @@ function App() {
     };
 
     return (
+        <div className='App'>
         <BrowserRouter>
             <Navibar isAuthenticated={isAuthenticated} onLogout={onLogout} />
             <Routes>
@@ -47,6 +50,20 @@ function App() {
                             <Navigate to="/login" />
                         )
                     }
+                />
+                <Route
+                    path="single"
+                    element={
+                        isAuthenticated ? (
+                            <SingleMetrics />
+                        ) : (
+                            <Navigate to="/login" />
+                        )
+                    }
+                />
+                <Route
+                    path="tables"
+                    element={isAuthenticated ? <TableView /> : <Navigate to="/login" />}
                 />
                 <Route
                     path="admin"
@@ -75,6 +92,7 @@ function App() {
                 <Route path="*" element={<NoPage />} />
             </Routes>
         </BrowserRouter>
+        </div>
     );
 }
 

@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { getToken } from '../../models/token'
 import * as XLSX from "xlsx";
 
 // Menu props for the multiselect filters
@@ -133,6 +131,40 @@ const initialBlankRadarData = {
     }]
 };
 
+const initialBlankRadarDataForSingleUser = {
+    labels: [
+        'Innovación social y sostenibilidad financiera',
+        'Conciencia y valor social',
+        'Liderazgo',
+        'Autocontrol',
+        'Pensamiento sistémico',
+        'Pensamiento científico',
+        'Pensamiento crítico',
+        'Pensamiento innovador',
+    ],
+    datasets: [{
+        label: 'Cuestionario Inicial',
+        data: [],
+        fill: true,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgb(54, 162, 235)',
+        pointBackgroundColor: 'rgb(54, 162, 235)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(54, 162, 235)'
+    }, {
+        label: 'Cuestionario Final',
+        data: [],
+        fill: true,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgb(255, 99, 132)',
+        pointBackgroundColor: 'rgb(255, 99, 132)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(255, 99, 132)'
+    }]
+};
+
 const initialBlankBarData = {
     labels: [
         ['Innovación', 'social y', 'sostenibilidad', 'financiera'],
@@ -154,27 +186,6 @@ const initialBlankBarData = {
         backgroundColor: colors,
     }]
 };
-
-// fetch raw charts data.
-async function fetchData() {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error('No token found');
-    }
-
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/user/info/all`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Token ${token}`
-            }
-        });
-        return response.data;
-    } catch (error) {
-        throw Error('Internal error');
-    }
-}
 
 /*  Calculate the averages of all properties for the initial or final scores from filtered data.  */
 // filter data by filters.
@@ -295,6 +306,6 @@ function downloadExcel(data) {
 
 export {
     MenuProps, sexs, academic_degrees, institutions, disciplines, countries, initialBlankRadarData,
-    initialBlankBarData, softColors, colors,
-    fetchData, filterData, average, calculateAverage, downloadExcel
+    initialBlankRadarDataForSingleUser ,initialBlankBarData, softColors, colors,
+    filterData, average, calculateAverage, downloadExcel
 };

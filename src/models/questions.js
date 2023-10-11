@@ -29,12 +29,10 @@ export async function getData(){
     };
 
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/response/retrieve-forms/`, { headers: headers });
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}sel4c/methodology/formsquestions/`, { headers: headers });
         return response.data;
     } catch (error) {
         console.error('Internal error:', error);
         return false;
     };
 };
-
-export function getData() {}
