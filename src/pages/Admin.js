@@ -1,33 +1,24 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography } from '@mui/material';
 import { Sel4cTable } from "../components/Sel4cTable";
 import AdminModal from "../components/Admin/AdminModal";
-import { columns as usersColumns, getData as getUsers, deleteData as deleteUser } from "../models/users";
-import { formResponseColumns, getData as getFormResponses } from "../models/forms";
-import { activitiesColumns } from "../models/activities";
+import { adminColumns, getAdmins, deleteData as deleteUser } from "../models/users";
 import ErrorModal from "../components/ErrorModal";
 
 const Admin = () => {
     // Track users data
-    const [usersData, setUsersData] = React.useState([]);
-    // Track form responses data
-    const [formResponseData, setFormResponseData] = React.useState([]);
-    // Track activities data
-    const [activitiesData, setActivitiesData] = React.useState([]);
-    // Error feedback
-    const [openError, setOpenError] = React.useState(false);
-    const handleCloseError = () => setOpenError(false);
-    const [errorMessage, setErrorMessage] = React.useState('');
+    const [usersData, setUsersData] = useState([]);
 
-    React.useEffect(() => {
+    // Error feedback
+    const [openError, setOpenError] = useState(false);
+    const handleCloseError = () => setOpenError(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
         const fetchData = async () => {
             try {
-                const userResponseData = await getUsers();
+                const userResponseData = await getAdmins();
                 setUsersData(userResponseData);
-                const formResponseData = await getFormResponses();
-                setFormResponseData(formResponseData);
-                //const activitiesData = await getActivities();
-                //setActivitiesData(activitiesData);
             } catch (error) {
                 // Handle errors, e.g., show an error message
                 setErrorMessage('Error al cargar datos');
@@ -59,43 +50,32 @@ const Admin = () => {
             // Set the updated copy as the new state for usersData
             setUsersData(updatedUsersData);
         } catch (error) {
-            console.error('Error deleting user(s):', error);
+            setErrorMessage('Error al desactivar usuario(s)');
+            setOpenError(true);
         }
     };
 
 
 
     return (
-        <div>
-            <div id="admin-content">
-                <Box sx={{
-                    width: '100%',
-                    padding: '3rem'
-                }}>
-                    <Typography variant="h3" align="center"> Usuarios y actividades </Typography>
-                    <Sel4cTable
-                        title="Usuarios"
-                        data={usersData}
-                        columns={usersColumns}
-                        options={{
-                            customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} usersData={usersData} />,
-                            onRowsDelete: handleUserRowsDelete,
-                            selectableRowsOnClick: true,
-                        }}
-                    />
-                    <Sel4cTable
-                        title="Respuestas de formulario"
-                        data={formResponseData}
-                        columns={formResponseColumns}
-                    />
-                    <Sel4cTable
-                        title="Actividades"
-                        data={activitiesData}
-                        columns={activitiesColumns}
-                    />
-                </Box>
-                <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
-            </div>
+        <div id="admin-content">
+            <Box sx={{
+                width: '100%',
+                padding: '3rem'
+            }}>
+                <Typography variant="h3" align="center"> Administrar Investigadores </Typography>
+                <Sel4cTable
+                    title="Usuarios"
+                    data={usersData}
+                    columns={adminColumns}
+                    options={{
+                        customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} usersData={usersData} />,
+                        onRowsDelete: handleUserRowsDelete,
+                        selectableRowsOnClick: true,
+                    }}
+                />
+            </Box>
+            <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
         </div>
     );
 }

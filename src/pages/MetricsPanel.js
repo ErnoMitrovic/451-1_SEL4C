@@ -5,9 +5,10 @@ import { RadarChart } from '../components/Charts/RadarChart';
 import { BarChart } from '../components/Charts/BarChart';
 import { RadarChartFilters } from '../components/Filters/RadarChartFilters';
 import { BarChartFilters } from '../components/Filters/BarChartFilters';
-import { fetchData, filterData, calculateAverage, initialBlankRadarData, initialBlankBarData, softColors, colors, downloadExcel } from '../components/utils/chartUtils';
+import { filterData, calculateAverage, initialBlankRadarData, initialBlankBarData, softColors, colors, downloadExcel } from '../components/utils/chartUtils';
 import { FilterList, TableChartOutlined } from '@mui/icons-material';
-import { Stack, Modal, Container, IconButton } from '@mui/material';
+import { Stack, Modal, Container, IconButton, Grid, Card, CardContent, Typography } from '@mui/material';
+import { getUsers } from '../models/users';
 import ErrorModal from '../components/ErrorModal';
 
 export default function MetricsPanel() {
@@ -48,7 +49,7 @@ export default function MetricsPanel() {
         const init = async () => {
             try {
                 // Fetch the data from the API and set the full raw gathered data and the on-load filtered data
-                const fetchedData = await fetchData();
+                const fetchedData = await getUsers();
                 setFetchedData(fetchedData);
                 var filters = {
                     sex: ['Masculino', 'Femenino', 'No binarie', 'Prefiero no decir'],
@@ -173,6 +174,45 @@ export default function MetricsPanel() {
 
     return (
         <div>
+            <Grid container spacing={2}>
+                <Grid item xs={4} display='flex' justifyContent='center'>
+                    <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#DDABFF', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                        <CardContent>
+                            <Typography variant="h4" component="div">
+                                Conteo de usuarios
+                            </Typography>
+                            <Typography variant="body2">
+                                Total: {Object.keys(fetchedData).length}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={4} display='flex' justifyContent='center'>
+                    <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#98d6fa', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                        <CardContent>
+                            <Typography variant="h4" component="div">
+                                Archivos subidos
+                            </Typography>
+                            <Typography variant="body2">
+                                Total: 2
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={4} display='flex' justifyContent='center'>
+                    <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#a6ff80', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                        <CardContent>
+                            <Typography variant="h4" component="div">
+                                Actividades recibidas
+                            </Typography>
+                            <Typography variant="body2">
+                                Total: 4
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+
             <Sel4cCard flexDirection='column'>
                 <Stack maxWidth={1} width='30rem' p={0.5}>
                     <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
