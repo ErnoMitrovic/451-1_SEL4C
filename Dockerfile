@@ -6,7 +6,7 @@ COPY src/ /app/src
 COPY package.json /app/
 RUN npm install
 
-ENV REACT_APP_API_BASE_URL=http://ec2-54-219-232-127.us-west-1.compute.amazonaws.com/
+ENV REACT_APP_API_BASE_URL=http://ec2-54-241-143-180.us-west-1.compute.amazonaws.com/
 
 EXPOSE 3000
 CMD ["npm", "start"]
