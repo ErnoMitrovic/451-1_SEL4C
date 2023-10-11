@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+    client:
+        image: client-prod-i
+        build:
+            dockerfile: Dockerfile.prod
+            args:
+                REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
+        container_name: client-prod-c
+        ports:
+            - "8080:80"
+        environment:
+            - NODE_ENV=production
+            - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
+        env_file:
+            - .env
+
