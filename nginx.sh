@@ -5,8 +5,10 @@
 sudo apt update
 sudo apt upgrade -y
 
-# Install Node.js
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+source .bashrc
+nvm install --lts
 
 # Install Nginx
 sudo apt install -y nginx
@@ -46,5 +48,6 @@ sudo nginx -t
 # Restart Nginx to apply changes
 sudo systemctl restart nginx
 
+ENV_VARIABLE=$1
 # Create an environment variable (assuming you are in the project directory)
-echo "REACT_APP_API_BASE_URL=" >> .env
+echo "REACT_APP_API_BASE_URL=$ENV_VARIABLE" >> .env
