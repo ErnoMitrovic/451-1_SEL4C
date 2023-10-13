@@ -45,7 +45,6 @@ export function FormsCard({ onLogin }) {
                     const cookies = new Cookies();
                     const token = response.data.token
                     cookies.set('token', token, { path: '/' });
-                    console.log("Token from cookie: " + getToken())
                     // Check if user is admin, if so, navigate to home page
                     // else, display error message
                     if (await isAdmin() === true) {

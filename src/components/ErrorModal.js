@@ -14,7 +14,7 @@ const styleModalError = {
 export default function ErrorModal({ openError, handleCloseError, errorMessage }) {
     return (
         <Modal
-            open={openError}
+            open={openError | false}
             onClose={handleCloseError}
             aria-labelledby="child-modal-title"
             aria-describedby="child-modal-description"

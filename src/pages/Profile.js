@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import ProfileUpdateModal from '../components/Profile/ProfileUpdateModal';
 import { getMe } from "../models/users";
 import ErrorModal from '../components/ErrorModal';
+import { Button } from '@mui/material';
 
 export default function Profile() {
     // Track user data
@@ -45,7 +46,7 @@ export default function Profile() {
                 justifyContent: 'center',
                 flexWrap: 'wrap',
                 flexGrow: 1,
-                margin: '2rem 0'
+                margin: '2rem 0',
             }}>
                 <p className='title'>Información del perfil</p>
                 <div className="info">
@@ -57,7 +58,9 @@ export default function Profile() {
                 <div>
                     <ProfileUpdateModal onSuccess={handleUserDataUpdateSuccess} />
                 </div>
-                
+                <Button href='/change-password/' variant='contained' sx={{marginTop: 2}} >
+                    Cambiar contraseña
+                </Button>
             </Box>
             <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
         </div>

@@ -11,11 +11,13 @@ import TableView from './pages/TableView';
 import ForgetPasswordSendEmail from './pages/user_auth/ForgetPasswordSendEmail';
 import { Navibar } from './components/Navibar';
 import { removeToken, isAdmin } from './models/token';
+import { ChangePassword } from './pages/user_auth/ChangePassword';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
+        console.log(isAuthenticated)
         isAdmin()
             .then(result => {
                 setIsAuthenticated(result);
@@ -39,64 +41,71 @@ function App() {
 
     return (
         <div className='App'>
-        <BrowserRouter>
-            <Navibar isAuthenticated={isAuthenticated} onLogout={onLogout} />
-            <Routes>
-                <Route
-                    path=""
-                    element={
-                        isAuthenticated ? (
-                            <MetricsPanel />
-                        ) : (
-                            <Navigate to="/login" />
-                        )
-                    }
-                />
-                <Route
-                    path="single"
-                    element={
-                        isAuthenticated ? (
-                            <SingleMetrics />
-                        ) : (
-                            <Navigate to="/login" />
-                        )
-                    }
-                />
-                <Route
-                    path="tables"
-                    element={isAuthenticated ? <TableView /> : <Navigate to="/login" />}
-                />
-                <Route
-                    path="admin"
-                    element={
-                        isAuthenticated ? (
-                            <Admin />
-                        ) : (
-                            <Navigate to="/login" />
-                        )
-                    }
-                />
-                <Route
-                    path="login"
-                    element={<Login onLogin={onLogin} />}
-                />
-                <Route
-                    path="forgetPassword"
-                    element={
-                    !isAuthenticated && (<ForgetPasswordSendEmail />)} />
-                <Route
-                    path="profile"
-                    element={
-                        isAuthenticated ? (
-                            <Profile />
-                        ) : (
-                            <Navigate to="/login" />
-                        )
-                    }
-                />
-                <Route path="*" element={<NoPage />} />
-            </Routes>
-        </BrowserRouter>
+            <BrowserRouter>
+                <Navibar isAuthenticated={isAuthenticated} onLogout={onLogout} />
+                <Routes>
+                    <Route
+                        path=""
+                        element={
+                            isAuthenticated ? (
+                                <MetricsPanel />
+                            ) : (
+                                <Navigate to="/login" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="single"
+                        element={
+                            isAuthenticated ? (
+                                <SingleMetrics />
+                            ) : (
+                                <Navigate to="/login" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="tables"
+                        element={isAuthenticated ? <TableView /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="admin"
+                        element={
+                            isAuthenticated ? (
+                                <Admin />
+                            ) : (
+                                <Navigate to="/login" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="login"
+                        element={<Login onLogin={onLogin} />}
+                    />
+                    <Route
+                        path="forgetPassword"
+                        element={
+                            !isAuthenticated && (<ForgetPasswordSendEmail />)} />
+                    <Route
+                        path="profile"
+                        element={
+                            isAuthenticated ? (
+                                <Profile />
+                            ) : (
+                                <Navigate to="/login" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="change-password"
+                        element={
+                            isAuthenticated &&
+                            <ChangePassword />
+                        }
+                    />
+                    <Route path="*" element={<NoPage />} />
+                </Routes>
+            </BrowserRouter>
         </div>
     );
 }

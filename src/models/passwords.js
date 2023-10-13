@@ -12,7 +12,7 @@ export async function changePassword(oldPassword, newPassword) {
         new_password: newPassword
     }
     let json = JSON.stringify(userCredentials)
-    return axios.post(`${backendURL}password/`, json, {
+    return axios.patch(`${backendURL}change-password/`, json, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Token ' + token
