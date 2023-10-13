@@ -47,7 +47,7 @@ export default function Profile() {
                 flexGrow: 1,
                 margin: '2rem 0'
             }}>
-                <p className='title'>Esta es la página de profile</p>
+                <p className='title'>Información del perfil</p>
                 <div className="info">
                     <span className="label">Correo electrónico:</span> {email}
                 </div>
@@ -57,9 +57,7 @@ export default function Profile() {
                 <div>
                     <ProfileUpdateModal onSuccess={handleUserDataUpdateSuccess} />
                 </div>
-                <div>
-                    Aqui deberia ir el link para recuperar contraseña
-                </div>
+                
             </Box>
             <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
         </div>
