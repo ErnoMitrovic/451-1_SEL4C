@@ -127,23 +127,6 @@ export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredDat
 
     const handleUpdateRadarData = () => {
 
-        if (selectedSexs.length === 0) {
-            alert('Selecciona al menos un sexo');
-            return;
-        } else if (selectedDisciplines.length === 0) {
-            alert('Selecciona al menos una disciplina');
-            return;
-        } else if (selectedCountries.length === 0) {
-            alert('Selecciona al menos un país');
-            return;
-        } else if (selectedAcademicDegrees.length === 0) {
-            alert('Selecciona al menos un grado de estudios');
-            return;
-        } else if (selectedInstitutions.length === 0) {
-            alert('Selecciona al menos una institución');
-            return;
-        }
-
         const filters = {
             sex: selectedSexs,
             disciplines: selectedDisciplines,
@@ -259,10 +242,6 @@ export function RadarChartFilters({ fetchedData, updateRadarData, setFilteredDat
             padding: '2rem',
             overflowY: 'scroll',
         }}>
-
-
-
-
 
             <Grid item xs={12}>
                 <Typography variant='h6' sx={{ textAlign: 'center', marginBottom: '1rem', color: 'gray' }}>Filtrar datos</Typography>
