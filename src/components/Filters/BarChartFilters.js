@@ -127,23 +127,6 @@ export function BarChartFilters({ fetchedData, updateBarData, setFilteredData, o
 
     const handleUpdateBarData = () => {
 
-        if (selectedSexs.length === 0) {
-            alert('Selecciona al menos un sexo');
-            return;
-        } else if (selectedDisciplines.length === 0) {
-            alert('Selecciona al menos una disciplina');
-            return;
-        } else if (selectedCountries.length === 0) {
-            alert('Selecciona al menos un país');
-            return;
-        } else if (selectedAcademicDegrees.length === 0) {
-            alert('Selecciona al menos un grado de estudios');
-            return;
-        } else if (selectedInstitutions.length === 0) {
-            alert('Selecciona al menos una institución');
-            return;
-        }
-
         const filters = {
             sex: selectedSexs,
             disciplines: selectedDisciplines,
