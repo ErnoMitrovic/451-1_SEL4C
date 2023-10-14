@@ -1,7 +1,7 @@
 import { Stack, Typography, Input, FormControl, InputLabel, FormHelperText, Button } from "@mui/material";
 import React from "react";
 import { Sel4cCard } from "./Sel4cCard";
-import { createToken, getToken, isAdmin } from "../models/token";
+import { createToken, isAdmin } from "../models/token";
 import Cookies from 'universal-cookie';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorModal from "./ErrorModal";

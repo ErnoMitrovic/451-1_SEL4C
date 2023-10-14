@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Modal, IconButton, Alert } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { ErrorOutline, Close, CheckCircleOutline, InfoOutlined } from "@mui/icons-material";
 
 const styleModal = {
     position: 'absolute',
@@ -11,31 +11,44 @@ const styleModal = {
     borderRadius: '1rem',
 };
 
-export default function SuccessModal({ openError, handleCloseError, errorMessage }) {
+export default function GenericModalAlert({ open, handleClose, message, severity }) {
+
+    const [openModal, setOpenModal] = React.useState(open);
+
     return (
         <Modal
-            open={openError}
-            onClose={handleCloseError}
+            open={openModal | false}
+            onClose={()=> {
+                setOpenModal(false)
+                handleClose()
+            }}
             aria-labelledby="child-modal-title"
             aria-describedby="child-modal-description"
         >
             <Box sx={{ ...styleModal }}>
                 <Alert
+                    severity={severity}
+                    iconMapping={{
+                        success: <CheckCircleOutline />,
+                        error: <ErrorOutline />,
+                        info: <InfoOutlined />,
+                    }}
                     action={
                         <IconButton
                             aria-label="close"
                             color="inherit"
                             size="small"
                             onClick={() => {
-                                handleCloseError();
+                                setOpenModal(false);
+                                handleClose();
                             }}
                         >
-                            <CloseIcon fontSize="inherit" />
+                            <Close fontSize="inherit" />
                         </IconButton>
                     }
                     autoFocus={false}
                 >
-                    {errorMessage}
+                    {message}
                 </Alert>
             </Box>
         </Modal>

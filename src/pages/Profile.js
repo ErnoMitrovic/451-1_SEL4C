@@ -5,6 +5,7 @@ import ProfileUpdateModal from '../components/Profile/ProfileUpdateModal';
 import { getMe } from "../models/users";
 import ErrorModal from '../components/ErrorModal';
 import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
     // Track user data
@@ -14,6 +15,7 @@ export default function Profile() {
     const [openError, setOpenError] = React.useState(false);
     const handleCloseError = () => setOpenError(false);
     const [errorMessage, setErrorMessage] = React.useState('');
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -58,7 +60,11 @@ export default function Profile() {
                 <div>
                     <ProfileUpdateModal onSuccess={handleUserDataUpdateSuccess} />
                 </div>
-                <Button href='/change-password/' variant='contained' sx={{marginTop: 2}} >
+                <Button variant='contained' sx={{marginTop: 2}} onClick={
+                    () => {
+                        navigate('/change-password')
+                    }
+                } >
                     Cambiar contraseña
                 </Button>
             </Box>

@@ -10,14 +10,13 @@ import SingleMetrics from './pages/SingleMetrics';
 import TableView from './pages/TableView';
 import ForgetPasswordSendEmail from './pages/user_auth/ForgetPasswordSendEmail';
 import { Navibar } from './components/Navibar';
-import { removeToken, isAdmin } from './models/token';
+import { removeToken, isAdmin, getToken } from './models/token';
 import { ChangePassword } from './pages/user_auth/ChangePassword';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        console.log(isAuthenticated)
         isAdmin()
             .then(result => {
                 setIsAuthenticated(result);
@@ -35,8 +34,8 @@ function App() {
     };
 
     const onLogout = () => {
+        console.log("Logging out...")
         removeToken();
-        setIsAuthenticated(false);
     };
 
     return (
@@ -99,8 +98,11 @@ function App() {
                     <Route
                         path="change-password"
                         element={
-                            isAuthenticated &&
-                            <ChangePassword />
+                            isAuthenticated ? (
+                                <ChangePassword />
+                            ) : (
+                                <Navigate to="/login" />
+                            )
                         }
                     />
                     <Route path="*" element={<NoPage />} />

@@ -23,7 +23,7 @@ export function getToken() {
 export function removeToken() {
     const req = { headers: { cookie: '' } };
     const cookies = new Cookies(req.headers.cookie, { path: '/' });
-    cookies.remove('token');
+    cookies.remove('token', { path: '/' });
 }
 
 export async function isAdmin() {

@@ -215,7 +215,7 @@ export default function MetricsPanel() {
 
             <Sel4cCard flexDirection='column'>
                 <Stack maxWidth={1} width='30rem' p={0.5}>
-                    <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
+                    <Stack width={1} justifyContent='right' borderBottom={2}>
                         <IconButton
                             onClick={() => {
                                 downloadExcel(filteredRadarData);

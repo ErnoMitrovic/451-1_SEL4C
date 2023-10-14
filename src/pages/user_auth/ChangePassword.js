@@ -1,7 +1,8 @@
-import { FormControl, FormHelperText, Stack, Typography, InputLabel, Input, Button, Alert } from "@mui/material"
+import { FormControl, FormHelperText, Stack, Typography, InputLabel, Input, Button } from "@mui/material"
 import React, { useEffect } from "react";
 import { Sel4cCard } from "../../components/Sel4cCard";
 import { changePassword } from "../../models/passwords";
+import GenericModalAlert from "../../components/GenericModalAlert";
 
 export function ChangePassword() {
 
@@ -10,6 +11,11 @@ export function ChangePassword() {
     const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
     const [error, setError] = React.useState('');
     const [errorConfirm, setErrorConfirm] = React.useState('');
+
+    // To handle modal alert severity and open state
+    const [modalAlertSeverity, setModalAlertSeverity] = React.useState('success');
+    const [modalAlertOpen, setModalAlertOpen] = React.useState(false);
+    const [modalAlertMessage, setModalAlertMessage] = React.useState('Contraseña cambiada correctamente');
 
     // Validate new passwords according to the following rules:
     // - Your password can’t be too similar to your other personal information.
@@ -28,23 +34,29 @@ export function ChangePassword() {
             setError('');
         }
     }
-    
+
     useEffect(validatePassword, [oldPassword, error, newPassword])
     useEffect(() => {
-        if(confirmNewPassword !== newPassword) {
+        if (confirmNewPassword !== newPassword) {
             setErrorConfirm('Las contraseñas no coinciden');
         } else {
             setErrorConfirm('');
         }
     }, [confirmNewPassword, newPassword])
 
-    function handleSubmit(event){
+    function handleSubmit(event) {
         event.preventDefault();
-        if(!error && !errorConfirm) {
-            changePassword(oldPassword, newPassword).then((_) => {
-                console.log("Contraseña actualizada")
+        if (error !== '' && errorConfirm !== '') {
+            changePassword(oldPassword, newPassword).then((response) => {
+                console.log(response.data);
+                setModalAlertOpen(true);
+                setModalAlertSeverity('success');
+                setModalAlertMessage(response.data.message);
             }).catch((error) => {
-                console.log(error)
+                console.log(error.response.data.message)
+                setModalAlertOpen(true);
+                setModalAlertSeverity('error');
+                setModalAlertMessage('Error al cambiar contraseña: ' + error.response.data.message);
             })
         }
     }
@@ -68,41 +80,42 @@ export function ChangePassword() {
                 onSubmit={handleSubmit}>
                 <FormControl required fullWidth>
                     <InputLabel htmlFor="current">Contraseña actual</InputLabel>
-                    <Input id="current" aria-describedby="current-helper" 
-                    value={oldPassword}
-                    onChange={(event) => setOldPassword(event.target.value)}
-                    type="password"/>
+                    <Input id="current" aria-describedby="current-helper"
+                        value={oldPassword}
+                        onChange={(event) => setOldPassword(event.target.value)}
+                        type="password" />
                 </FormControl>
-                <FormControl 
-                required
-                error={error}
-                fullWidth>
+                <FormControl
+                    required
+                    error={error !== ''}
+                    fullWidth>
                     <InputLabel htmlFor="new">Nueva contraseña</InputLabel>
-                    <Input id="new" aria-describedby="new-helper" 
-                    value={newPassword} 
-                    onChange={(event) => setNewPassword(event.target.value)} 
-                    type="password"/>
+                    <Input id="new" aria-describedby="new-helper"
+                        value={newPassword}
+                        onChange={(event) => setNewPassword(event.target.value)}
+                        type="password" />
                     <FormHelperText>
-                    {error}
-                    <br/>
-                    Tu contraseña no puede ser igual a la anterior
-                    <br/>
-                    Tu contraseña debe tener al menos 8 caracteres
-                    <br/>
-                    Tu contraseña no puede ser solo numérica
-                    <br/>
+                        {error}
+                        <br />
+                        Tu contraseña no puede ser igual a la anterior
+                        <br />
+                        Tu contraseña debe tener al menos 8 caracteres
+                        <br />
+                        Tu contraseña no puede ser solo numérica
+                        <br />
                     </FormHelperText>
                 </FormControl>
                 <FormControl required fullWidth >
                     <InputLabel htmlFor="confirm">Confirm new password</InputLabel>
-                    <Input id="confirm" aria-describedby="confirm" 
-                    value={confirmNewPassword}
-                    onChange={(event) => setConfirmNewPassword(event.target.value)}
-                    error={errorConfirm} 
-                    type="password"/>
+                    <Input id="confirm" aria-describedby="confirm"
+                        value={confirmNewPassword}
+                        onChange={(event) => setConfirmNewPassword(event.target.value)}
+                        error={errorConfirm !== ''}
+                        type="password" />
                     <FormHelperText>{errorConfirm}</FormHelperText>
                 </FormControl>
                 <Button type="submit" variant="contained">Cambiar contraseña</Button>
+                <GenericModalAlert severity={modalAlertSeverity} open={Boolean(modalAlertOpen)} message={modalAlertMessage} />
             </Stack>
         </Sel4cCard>
     )
