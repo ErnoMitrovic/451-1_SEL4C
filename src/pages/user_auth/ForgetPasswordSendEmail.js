@@ -1,14 +1,17 @@
-import { Box, Typography, Stack, FormControl, InputLabel, Input, FormHelperText, Button, Modal } from "@mui/material";
+import { Typography, Stack, FormControl, InputLabel, Input, FormHelperText, Button } from "@mui/material";
 import { Sel4cCard } from "../../components/Sel4cCard";
 import React from "react";
-import { Navigate } from "react-router-dom";
+import GenericModalAlert from "../../components/GenericModalAlert";
+import { resetPassword } from "../../models/passwords";
 
 export default function ForgetPasswordSendEmail() {
 
     // Confirmation modal
-    const [open, setOpen] = React.useState(false);
+    const [openConfirmation, setOpenConfirmation] = React.useState(false);
     // Track email
     const [email, setEmail] = React.useState('');
+    // Success message
+    const successMessage = 'Te hemos mandado un link a tu correo para recuperar tu contraseña.';
     // Check error
     const emailError = () => {
         if (!email) return true;
@@ -26,27 +29,26 @@ export default function ForgetPasswordSendEmail() {
     const handleSubmit = (event) => {
         event.preventDefault();
         if (!emailError()) {
-            setOpen(true);
+            resetPassword(email).then(
+                () => {
+                    setOpenConfirmation(true);
+                }
+            ).catch(
+                (error) => {
+                    console.log(error.message);
+                })
         }
     };
 
     // Handle close modal
     const handleClose = () => {
-        setOpen(false);
-        <Navigate to='/login' />
+        setOpenConfirmation(false);
+        window.location.href = '/login';
     };
 
     return (
         <Sel4cCard>
-            <Modal
-                open={open}
-                onClose={handleClose}>
-                <Box>
-                    <Typography variant="h3" textAlign='center' fontWeight='bold'>
-                        You will recieve a link to reset your password in your email.
-                    </Typography>
-                </Box>
-            </Modal>
+            <GenericModalAlert open={openConfirmation} handleClose={handleClose} message={successMessage} severity='success'/>
             <Stack minWidth='xs' width={0.8} p={3} spacing={2}>
                 <Typography variant="h3" textAlign='center' fontWeight='bold'>
                     Reset your password
@@ -62,8 +64,8 @@ export default function ForgetPasswordSendEmail() {
                             error={emailError()} />
                         <FormHelperText id="email-helper-text">{displayHelperTextEmail()}</FormHelperText>
                     </FormControl>
+                    <Button type="submit" variant="contained">Send</Button>
                 </Stack>
-                <Button type="submit" variant="contained">Send</Button>
             </Stack>
         </Sel4cCard>
     );

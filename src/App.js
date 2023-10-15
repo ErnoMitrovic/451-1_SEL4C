@@ -9,8 +9,9 @@ import NoPage from './pages/NoPage';
 import SingleMetrics from './pages/SingleMetrics';
 import TableView from './pages/TableView';
 import ForgetPasswordSendEmail from './pages/user_auth/ForgetPasswordSendEmail';
+import ForgetPasswordConfirm from './pages/user_auth/ForgetPasswordConfirm';
 import { Navibar } from './components/Navibar';
-import { removeToken, isAdmin, getToken } from './models/token';
+import { removeToken, isAdmin } from './models/token';
 import { ChangePassword } from './pages/user_auth/ChangePassword';
 
 function App() {
@@ -105,6 +106,9 @@ function App() {
                             )
                         }
                     />
+                    <Route 
+                        path="reset-password-confirm"
+                        element={<ForgetPasswordConfirm />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>
             </BrowserRouter>

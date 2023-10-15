@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Modal, IconButton, Alert } from '@mui/material';
 import { ErrorOutline, Close, CheckCircleOutline, InfoOutlined } from "@mui/icons-material";
 
@@ -14,6 +14,10 @@ const styleModal = {
 export default function GenericModalAlert({ open, handleClose, message, severity }) {
 
     const [openModal, setOpenModal] = React.useState(open);
+
+    useEffect(() => {
+        setOpenModal(open);
+    }, [open])
 
     return (
         <Modal

@@ -161,16 +161,3 @@ export async function deleteData(id) {
     };
 
 };
-
-export async function resetPassword(email){
-    const headers = {
-        'Content-Type': 'application/json',
-    };
-
-    try {
-        await axios.post(`${BASE_URL}sel4c/user/reset-password/`, {email: email}, { headers: headers });
-        return;
-    } catch (error) {
-        throw new Error('Internal error');
-    };
-}
