@@ -4,7 +4,7 @@ import { Sel4cTable } from "../components/Sel4cTable";
 import { usersColumns, getUsers, deleteData as deleteUser } from "../models/users";
 import { formResponseColumns, getData as getFormResponses } from "../models/forms";
 import { getData as getQuestions } from '../models/questions';
-import { activitiesColumns } from "../models/activities";
+import { activitiesColumns, getData as getActivities, filterUserDefaults, getActivityProgress } from "../models/activities";
 import ErrorModal from "../components/ErrorModal";
 
 function TableView() {
@@ -14,8 +14,6 @@ function TableView() {
     const [formResponseData, setFormResponseData] = useState([]);
     // Track activities data
     const [activitiesData, setActivitiesData] = useState([]);
-    // Track questions data
-    const [questionsData, setQuestionsData] = useState([]);
 
     // Error feedback
     const [openError, setOpenError] = useState(false);
@@ -56,7 +54,7 @@ function TableView() {
                 formResponseData.forEach((formResponse) => {
                     const user = usersData.find((user) => user.user === formResponse.user);
                     formResponse.user = user.full_name;
-                    
+
                 });
                 const questionsData = await getQuestions();
                 // Append question.question to their matching form response
@@ -65,8 +63,9 @@ function TableView() {
                     formResponse.question = `${question.id}. ${question.question}`;
                 });
                 setFormResponseData(formResponseData);
-                //const activitiesData = await getActivities();
-                //setActivitiesData(activitiesData);
+                const rawActivitiesData = await getActivities();
+                const activitiesData = await filterUserDefaults(rawActivitiesData);
+                setActivitiesData(getActivityProgress(activitiesData));
             } catch (error) {
                 // Handle errors, e.g., show an error message
                 setErrorMessage('Error al cargar datos');
@@ -84,23 +83,35 @@ function TableView() {
             }}>
                 <Typography variant="h3" align="center"> Usuarios: respuestas y actividades </Typography>
                 <Sel4cTable
-                    title="Usuarios"
+                    title="Datos de Usuarios"
                     data={usersData}
                     columns={usersColumns}
                     options={{
                         onRowsDelete: handleUserRowsDelete,
                         selectableRowsOnClick: true,
+                        print: false,
+                        responsive: "simple",
                     }}
                 />
                 <Sel4cTable
                     title="Respuestas de formulario"
                     data={formResponseData}
                     columns={formResponseColumns}
+                    options={{
+                        print: false,
+                        responsive: "simple",
+                        customToolbarSelect: () => {},
+                    }}
                 />
                 <Sel4cTable
-                    title="Actividades"
+                    title="Progreso de Actividades por Usuario"
                     data={activitiesData}
                     columns={activitiesColumns}
+                    options={{
+                        print: false,
+                        responsive: "simple",
+                        customToolbarSelect: () => {},
+                    }}
                 />
             </Box>
             <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />

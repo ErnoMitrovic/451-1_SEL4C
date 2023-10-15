@@ -72,6 +72,8 @@ const Admin = () => {
                         customToolbar: () => <AdminModal onSuccess={handleUserCreationSuccess} usersData={usersData} />,
                         onRowsDelete: handleUserRowsDelete,
                         selectableRowsOnClick: true,
+                        print: false,
+                        responsive: "simple",
                     }}
                 />
             </Box>

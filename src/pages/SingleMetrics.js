@@ -1,11 +1,42 @@
 import './SingleMetrics.sass'
 import React, { useState, useEffect } from 'react';
-import { Typography, Grid, Paper, TextField, Autocomplete, CircularProgress, Stack, Box, Divider } from '@mui/material';
-import { initialBlankRadarDataForSingleUser, initialBlankBarData, softColors, colors } from '../components/utils/chartUtils';
+import { Typography, Paper, TextField, Autocomplete, CircularProgress, Stack, Box, Divider } from '@mui/material';
+import { initialBlankRadarDataForSingleUser, initialBlankBarData, colors } from '../components/utils/chartUtils';
 import { Sel4cCard } from '../components/Sel4cCard';
 import { RadarChart } from '../components/Charts/RadarChart';
 import { BarChart } from '../components/Charts/BarChart';
 import { getUsers } from '../models/users';
+import { getData as getActivities, filterUserDefaults, getActivityProgress } from '../models/activities';
+
+function CircularProgressWithLabel(props) {
+    return (
+        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            <CircularProgress
+                variant="determinate"
+                color="secondary"
+                size={100} // Adjust the size as needed
+                thickness={2} // Adjust the thickness as needed
+                {...props}
+            />
+            <Box
+                sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Typography variant="h6" component="div" color="text.secondary">
+                    {`${Math.round(props.value)}%`}
+                </Typography>
+            </Box>
+        </Box>
+    );
+}
 
 function getValuesForProperties(data) {
     if (!data || typeof data !== 'object') {
@@ -36,126 +67,165 @@ const SingleMetrics = () => {
 
     const handleUserChange = (event, newValue) => {
         setSelectedUser(newValue);
+        if (newValue) {
 
-        const initialScore = newValue.initial_score;
-        const finalScore = newValue.final_score;
-        const initialData = getValuesForProperties(initialScore);
-        const finalData = getValuesForProperties(finalScore);
+            const initialScore = newValue.initial_score;
+            const finalScore = newValue.final_score;
+            const initialData = getValuesForProperties(initialScore);
+            const finalData = getValuesForProperties(finalScore);
+            // get the delta between initial and final scores
+            const deltaData = initialData.map((value, index) => finalData[index] - value);
 
+            setRadarData({
+                labels: [
+                    'Innovación social y sostenibilidad financiera',
+                    'Conciencia y valor social',
+                    'Liderazgo',
+                    'Autocontrol',
+                    'Pensamiento sistémico',
+                    'Pensamiento científico',
+                    'Pensamiento crítico',
+                    'Pensamiento innovador',
+                ],
+                datasets: [{
+                    label: 'Cuestionario Inicial',
+                    data: initialData,
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(54, 162, 235)'
+                }, {
+                    label: 'Cuestionario Final',
+                    data: finalData,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)'
+                }],
+            });
+            setBarData({
+                labels: [
+                    ['Innovación', 'social y', 'sostenibilidad', 'financiera'],
+                    ['Conciencia', 'y valor', 'social'],
+                    'Liderazgo',
+                    'Autocontrol',
+                    ['Pensamiento', 'sistémico'],
+                    ['Pensamiento', 'científico'],
+                    ['Pensamiento', 'crítico'],
+                    ['Pensamiento', 'innovador'],
+                ],
+                datasets: [{
+                    label: 'Cambio de puntaje con respecto a la primera evaluación',
+                    data: deltaData,
+                    backgroundColor: colors,
+                }],
+            });
 
-        setRadarData({
-            labels: [
-                'Innovación social y sostenibilidad financiera',
-                'Conciencia y valor social',
-                'Liderazgo',
-                'Autocontrol',
-                'Pensamiento sistémico',
-                'Pensamiento científico',
-                'Pensamiento crítico',
-                'Pensamiento innovador',
-            ],
-            datasets: [{
-                label: 'Cuestionario Inicial',
-                data: initialData,
-                fill: true,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                pointBackgroundColor: 'rgb(54, 162, 235)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(54, 162, 235)'
-            }, {
-                label: 'Cuestionario Final',
-                data: finalData,
-                fill: true,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgb(255, 99, 132)',
-                pointBackgroundColor: 'rgb(255, 99, 132)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(255, 99, 132)'
-            }],
-        });
-        setBarData({
-            labels: [
-                ['Innovación', 'social y', 'sostenibilidad', 'financiera'],
-                ['Conciencia', 'y valor', 'social'],
-                'Liderazgo',
-                'Autocontrol',
-                ['Pensamiento', 'sistémico'],
-                ['Pensamiento', 'científico'],
-                ['Pensamiento', 'crítico'],
-                ['Pensamiento', 'innovador'],
-            ],
-            datasets: [{
-                label: 'Formulario Inicial',
-                data: initialData,
-                backgroundColor: softColors,
-            }, {
-                label: 'Formulario Final',
-                data: finalData,
-                backgroundColor: colors,
-            }],
-        });
+        } else {
+            // Handle the case when no user is selected, you can set your data to some default values or clear it.
+            setRadarData(initialBlankRadarDataForSingleUser);
+            setBarData(initialBlankBarData);
+        }
+
     }
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             const data = await getUsers();
-            setUsers(data);
+            const rawActivitiesData = await getActivities();
+            const activitiesData = await filterUserDefaults(rawActivitiesData);
+            const activitiesProgress = getActivityProgress(activitiesData);
+            // Add to users their progress based on activitiesProgress
+            const updatedUsers = data.map(user => {
+                const userProgress = activitiesProgress.find(progress => progress.user === user.user);
+                if (userProgress) {
+                    // If user has a matching activity progress, add user.progress
+                    user.progress = userProgress.progress;
+                } else {
+                    // If no matching progress found, set user.progress to 0
+                    user.progress = 0;
+                }
+                return user;
+            });
+            setUsers(updatedUsers);
             setLoading(false);
         };
         fetchData();
     }, []);
 
     return (
-        <Grid item xs={12} md={4} lg={3}>
-            <Paper>
-                <Typography variant="h2" gutterBottom textAlign={'center'} m={2}>
-                    Métricas individuales
-                </Typography>
-                {loading ? (
+        <>
+            <Typography variant="h2" gutterBottom textAlign={'center'} m={2}>
+                Métricas individuales
+            </Typography>
+            {loading ? (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                    }}
+                >
                     <CircularProgress />
-                ) : (
-                    <div>
-                        <Sel4cCard>
-                            <Stack direction="column" spacing={2} m={2} width={'80%'}>
-                                <Autocomplete
-                                    options={users}
-                                    getOptionLabel={(user) => user.full_name}
-                                    value={selectedUser}
-                                    onChange={handleUserChange}
-                                    renderInput={(params) => <TextField {...params} label="Select User" />}
-                                />
-                                {selectedUser && (
-                                    <>
-                                        <Box>
-                                            <Typography variant="h2">{selectedUser.full_name}</Typography>
-                                            <Divider />
-                                            <Typography variant='h4' textAlign={'center'}>Información demográfica</Typography>
-                                            <Typography variant='body1'><span className="label">Usuario número:</span> {selectedUser.user}</Typography>
-                                            <Typography variant="body1"><span className="label">Email:</span> {selectedUser.email}</Typography>
-                                            <Typography variant="body1"><span className="label">Grado académico:</span> {selectedUser.academic_degree}</Typography>
-                                            <Typography variant='body1'><span className="label">Institución:</span> {selectedUser.institution}</Typography>
-                                            <Typography variant='body1'><span className="label">Disciplina:</span> {selectedUser.discipline}</Typography>
-                                            <Typography variant='body1'><span className="label">Género:</span> {selectedUser.gender}</Typography>
-                                            <Typography variant='body1'><span className="label">Edad:</span> {selectedUser.age}</Typography>
-                                            <Typography variant='body1'><span className="label">País:</span> {selectedUser.country}</Typography>
+                </div>
+            ) : (
+                <div>
+                    <Sel4cCard>
+                        <Stack direction="column" spacing={2} m={2} width={'80%'}>
+                            <Autocomplete
+                                options={users}
+                                getOptionLabel={(user) => user.full_name}
+                                value={selectedUser}
+                                onChange={handleUserChange}
+                                renderInput={(params) => <TextField {...params} label="Select User" />}
+                            />
+                            {selectedUser && (
+                                <>
+                                    <Box>
+                                        <Typography variant="h2" m={2}>{selectedUser.full_name}</Typography>
+                                        <Divider />
+                                        <Typography variant='h4' textAlign={'center'} m={2}>Información demográfica</Typography>
+                                        <Typography variant='body1'><span className="label">Usuario número:</span> {selectedUser.user}</Typography>
+                                        <Typography variant="body1"><span className="label">Email:</span> {selectedUser.email}</Typography>
+                                        <Typography variant="body1"><span className="label">Grado académico:</span> {selectedUser.academic_degree}</Typography>
+                                        <Typography variant='body1'><span className="label">Institución:</span> {selectedUser.institution}</Typography>
+                                        <Typography variant='body1'><span className="label">Disciplina:</span> {selectedUser.discipline}</Typography>
+                                        <Typography variant='body1'><span className="label">Género:</span> {selectedUser.gender}</Typography>
+                                        <Typography variant='body1'><span className="label">Edad:</span> {selectedUser.age}</Typography>
+                                        <Typography variant='body1'><span className="label">País:</span> {selectedUser.country}</Typography>
+                                    </Box>
+                                    <Divider />
+                                    <Box flexWrap={1}>
+                                        <Typography variant='h4' textAlign={'center'} m={2}>Porcentaje de finalización de las actividades de SEL4C</Typography>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                            <CircularProgressWithLabel value={selectedUser.progress} />
+                                        </Box>
+                                    </Box>
+                                    <Divider />
+                                    <Stack spacing={3}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                            <Paper elevation={3}>
+                                                <RadarChart data={radarData} />
+                                            </Paper>
                                         </Box>
                                         <Divider />
-                                        <Box>
-                                            <RadarChart data={radarData} />
-                                            <BarChart data={barData} />
-                                        </Box>
-                                    </>
-                                )}
-                            </Stack>
-                        </Sel4cCard>
-                    </div>
-                )}
-            </Paper>
-        </Grid>
+                                        <BarChart data={barData} />
+                                    </Stack>
+                                </>
+                            )}
+                        </Stack>
+                    </Sel4cCard>
+                </div>
+            )}
+        </>
     );
 };
 

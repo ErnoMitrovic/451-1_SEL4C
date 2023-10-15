@@ -117,14 +117,6 @@ export function BarChartFilters({ fetchedData, updateBarData, setFilteredData, o
         }
     };
 
-    // Swtich to chose if the chart displays the initial or final average scores.
-    const [initialOrFinal, setInitialOrFinal] = React.useState(true);
-    const handleTestChange = (event) => {
-        setInitialOrFinal(event.target.checked);
-    };
-
-
-
     const handleUpdateBarData = () => {
 
         const filters = {
@@ -180,7 +172,7 @@ export function BarChartFilters({ fetchedData, updateBarData, setFilteredData, o
         }
         onFiltersChange(currentFilters);
         handleUpdateBarData();
-    }, [selectedSexs, selectedDisciplines, selectedCountries, selectedAcademicDegrees, selectedInstitutions, selectedAge, initialOrFinal]);
+    }, [selectedSexs, selectedDisciplines, selectedCountries, selectedAcademicDegrees, selectedInstitutions, selectedAge]);
 
     return (
         <Grid container sx={{
