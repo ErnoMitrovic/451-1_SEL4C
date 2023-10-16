@@ -20,10 +20,16 @@ const styleModalAdmin = {
 export default function ProfileUpdateModal({ onSuccess }) {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    function handleClose() {
+        setName('');
+        setEmail('');
+        setConfirmEmail('');
+        setOpen(false);
+    };
 
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
+    const [confirmEmail, setConfirmEmail] = React.useState('');
 
     const isEmailValid = () => {
         // Regular expression for email validation
@@ -34,22 +40,42 @@ export default function ProfileUpdateModal({ onSuccess }) {
     const displayHelperTextEmail = () => {
         if (email && !isEmailValid()) {
             return 'Invalid email address';
+        } else if (email && confirmEmail && email !== confirmEmail) {
+            return 'Email addresses do not match';
         }
         return '';
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Validate email and password
-        if (!isEmailValid()) {
+
+        let requestData = {};
+        if (!name && email) {
+
+            // Validate email and password
+            if (!isEmailValid()) {
+                return;
+            } else if (email !== confirmEmail) {
+                return;
+            }
+
+            requestData = {
+                email: email
+            };
+
+        } else if (name && !email) {
+            requestData = {
+                name: name
+            };
+        } else if (name && email) {
+
+            requestData = {
+                email: email,
+                name: name
+            };
+        } else {
             return;
         }
-
-        const requestData = {
-            email: email,
-            name: name
-        };
 
         const headers = {
             'Content-Type': 'application/json',
@@ -63,15 +89,11 @@ export default function ProfileUpdateModal({ onSuccess }) {
                 { headers: headers }
             );
 
-            // Handle success, show a success message and close the modal
-            console.log('Successfull request:');
-
             // Clear the form
             setName('');
             setEmail('');
             // Close the modal after a successful request
             handleClose();
-            alert('Información actualizada');
             // Pass the new user's data to the callback
             if (typeof onSuccess === "function") {
                 onSuccess(response.data);
@@ -136,8 +158,21 @@ export default function ProfileUpdateModal({ onSuccess }) {
                                     <FormHelperText id="email-helper-text">{displayHelperTextEmail()}</FormHelperText>
                                 </FormControl>
                             </Grid>
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="confirm-email">Confirmar Correo</InputLabel>
+                                    <Input
+                                        id="confirm-email"
+                                        aria-describedby="confirm-email-helper-text"
+                                        type='text'
+                                        value={confirmEmail}
+                                        onChange={(e) => setConfirmEmail(e.target.value)}
+                                    />
+                                    <FormHelperText id="confirm-email-helper-text">{displayHelperTextEmail()}</FormHelperText>
+                                </FormControl>
+                            </Grid>
                             <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button variant="contained" color="success" type="submit">Añadir</Button>
+                                <Button variant="contained" color="success" type="submit">Actualizar</Button>
                             </Grid>
                         </Grid>
                     </form>

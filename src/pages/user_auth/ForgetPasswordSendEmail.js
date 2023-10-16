@@ -27,6 +27,7 @@ export default function ForgetPasswordSendEmail() {
 
     // Handle submit
     const handleSubmit = (event) => {
+        console.log('submit');
         event.preventDefault();
         if (!emailError()) {
             resetPassword(email).then(
@@ -57,7 +58,7 @@ export default function ForgetPasswordSendEmail() {
                     Enter your email address and we will send you a link to reset your password.
                 </Typography>
                 <Stack component='form' onSubmit={handleSubmit}>
-                    <FormControl required>
+                    <FormControl required fullWidth>
                         <InputLabel htmlFor="email">Email</InputLabel>
                         <Input id="email" aria-describedby="email-helper-text" value={email}
                             onChange={(event) => setEmail(event.target.value)}
