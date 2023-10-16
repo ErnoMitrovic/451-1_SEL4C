@@ -1,7 +1,7 @@
 import { Stack, Typography, Input, FormControl, InputLabel, FormHelperText, Button } from "@mui/material";
 import React from "react";
 import { Sel4cCard } from "./Sel4cCard";
-import { createToken, getToken, isAdmin } from "../models/token";
+import { createToken, isAdmin } from "../models/token";
 import Cookies from 'universal-cookie';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorModal from "./ErrorModal";
@@ -45,7 +45,6 @@ export function FormsCard({ onLogin }) {
                     const cookies = new Cookies();
                     const token = response.data.token
                     cookies.set('token', token, { path: '/' });
-                    console.log("Token from cookie: " + getToken())
                     // Check if user is admin, if so, navigate to home page
                     // else, display error message
                     if (await isAdmin() === true) {

@@ -7,11 +7,14 @@ import { RadarChartFilters } from '../components/Filters/RadarChartFilters';
 import { BarChartFilters } from '../components/Filters/BarChartFilters';
 import { filterData, calculateAverage, initialBlankRadarData, initialBlankBarData, softColors, colors, downloadExcel } from '../components/utils/chartUtils';
 import { FilterList, TableChartOutlined } from '@mui/icons-material';
-import { Stack, Modal, Container, IconButton, Grid, Card, CardContent, Typography } from '@mui/material';
+import { Stack, Modal, Container, IconButton, Grid, Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import { getUsers } from '../models/users';
 import ErrorModal from '../components/ErrorModal';
 
 export default function MetricsPanel() {
+
+    // Loading state to display a loading spinner while the data is being fetched
+    const [loading, setLoading] = React.useState(true);
 
     // Fetch the data from the API; store full data in fetchedData and filtered data in filteredData
     const [fetchedData, setFetchedData] = React.useState({});
@@ -47,6 +50,7 @@ export default function MetricsPanel() {
 
     React.useEffect(() => {
         const init = async () => {
+            setLoading(true);
             try {
                 // Fetch the data from the API and set the full raw gathered data and the on-load filtered data
                 const fetchedData = await getUsers();
@@ -154,6 +158,8 @@ export default function MetricsPanel() {
             } catch (error) {
                 setErrorMessage('Error al cargar los datos');
                 setOpenError(true);
+            } finally {
+                setLoading(false);
             }
         };
         init();
@@ -173,115 +179,130 @@ export default function MetricsPanel() {
     }
 
     return (
-        <div>
-            <Grid container spacing={2}>
-                <Grid item xs={4} display='flex' justifyContent='center'>
-                    <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#DDABFF', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                        <CardContent>
-                            <Typography variant="h4" component="div">
-                                Conteo de usuarios
-                            </Typography>
-                            <Typography variant="body2">
-                                Total: {Object.keys(fetchedData).length}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={4} display='flex' justifyContent='center'>
-                    <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#98d6fa', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                        <CardContent>
-                            <Typography variant="h4" component="div">
-                                Archivos subidos
-                            </Typography>
-                            <Typography variant="body2">
-                                Total: 2
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={4} display='flex' justifyContent='center'>
-                    <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#a6ff80', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                        <CardContent>
-                            <Typography variant="h4" component="div">
-                                Actividades recibidas
-                            </Typography>
-                            <Typography variant="body2">
-                                Total: 4
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
+        <>
+            {loading ? (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                    }}
+                >
+                    <CircularProgress />
+                </div>
+            ) : (
+                <div>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={4} display='flex' justifyContent='center'>
+                            <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#DDABFF', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                                <CardContent>
+                                    <Typography variant="h4" component="div">
+                                        Conteo de usuarios
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Total: {Object.keys(fetchedData).length}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} md={4} display='flex' justifyContent='center'>
+                            <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#98d6fa', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                                <CardContent>
+                                    <Typography variant="h4" component="div">
+                                        Archivos subidos
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Total: 2
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} md={4} display='flex' justifyContent='center'>
+                            <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#a6ff80', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                                <CardContent>
+                                    <Typography variant="h4" component="div">
+                                        Actividades recibidas
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Total: 4
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    </Grid>
 
-            <Sel4cCard flexDirection='column'>
-                <Stack maxWidth={1} width='30rem' p={0.5}>
-                    <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
-                        <IconButton
-                            onClick={() => {
-                                downloadExcel(filteredRadarData);
-                            }}>
-                            <TableChartOutlined color='#1d6f42' />
-                        </IconButton>
-                        <IconButton onClick={() => setOpenModal(true)}>
-                            <FilterList />
-                        </IconButton>
-                    </Stack>
-                    <RadarChart data={radarData} />
-                </Stack>
-            </Sel4cCard>
-            <Modal open={openModal} onClose={handleCloseModal}>
-                <Container sx={{
-                    bgcolor: 'background.paper',
-                    border: '4px solid #000',
-                    boxShadow: 24,
-                    p: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    <RadarChartFilters
-                        fetchedData={fetchedData}
-                        updateRadarData={setRadarData}
-                        setFilteredData={setFilteredRadarData}
-                        onFiltersChange={setFilteredDataFromModal}
-                        currentFilters={filteredDataFromModal} />
-                </Container>
-            </Modal>
-            <Sel4cCard>
-                <Stack maxWidth={1} width='100%'>
-                    <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
-                        <IconButton
-                            onClick={() => {
-                                downloadExcel(filteredBarData);
-                            }}>
-                            <TableChartOutlined color='#1d6f42' />
-                        </IconButton>
-                        <IconButton onClick={() => setOpenBarModal(true)}>
-                            <FilterList />
-                        </IconButton>
-                    </Stack>
-                    <BarChart data={barData} />
-                </Stack>
-            </Sel4cCard>
-            <Modal open={openBarModal} onClose={handleCloseBarModal}>
-                <Container sx={{
-                    bgcolor: 'background.paper',
-                    border: '4px solid #000',
-                    boxShadow: 24,
-                    p: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    <BarChartFilters
-                        fetchedData={fetchedData}
-                        updateBarData={setBarData}
-                        setFilteredData={setFilteredBarData}
-                        onFiltersChange={setFilteredBarDataFromModal}
-                        currentFilters={filteredBarDataFromModal} />
-                </Container>
-            </Modal>
-            <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage} />
-        </div >
+                    <Sel4cCard flexDirection='column'>
+                        <Stack maxWidth={1} width='30rem' p={0.5}>
+                            <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
+                                <IconButton
+                                    onClick={() => {
+                                        downloadExcel(filteredRadarData);
+                                    }}>
+                                    <TableChartOutlined color='#1d6f42' />
+                                </IconButton>
+                                <IconButton onClick={() => setOpenModal(true)}>
+                                    <FilterList />
+                                </IconButton>
+                            </Stack>
+                            <RadarChart data={radarData} />
+                        </Stack>
+                    </Sel4cCard>
+                    <Modal open={openModal} onClose={handleCloseModal}>
+                        <Container sx={{
+                            bgcolor: 'background.paper',
+                            border: '4px solid #000',
+                            boxShadow: 24,
+                            p: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <RadarChartFilters
+                                fetchedData={fetchedData}
+                                updateRadarData={setRadarData}
+                                setFilteredData={setFilteredRadarData}
+                                onFiltersChange={setFilteredDataFromModal}
+                                currentFilters={filteredDataFromModal} />
+                        </Container>
+                    </Modal>
+                    <Sel4cCard>
+                        <Stack maxWidth={1} width='100%'>
+                            <Stack width={1} direction='row' justifyContent='right' borderBottom={2}>
+                                <IconButton
+                                    onClick={() => {
+                                        downloadExcel(filteredBarData);
+                                    }}>
+                                    <TableChartOutlined color='#1d6f42' />
+                                </IconButton>
+                                <IconButton onClick={() => setOpenBarModal(true)}>
+                                    <FilterList />
+                                </IconButton>
+                            </Stack>
+                            <BarChart data={barData} />
+                        </Stack>
+                    </Sel4cCard>
+                    <Modal open={openBarModal} onClose={handleCloseBarModal}>
+                        <Container sx={{
+                            bgcolor: 'background.paper',
+                            border: '4px solid #000',
+                            boxShadow: 24,
+                            p: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <BarChartFilters
+                                fetchedData={fetchedData}
+                                updateBarData={setBarData}
+                                setFilteredData={setFilteredBarData}
+                                onFiltersChange={setFilteredBarDataFromModal}
+                                currentFilters={filteredBarDataFromModal} />
+                        </Container>
+                    </Modal>
+                    <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage} />
+                </div >
+            )}
+        </>
     );
 }

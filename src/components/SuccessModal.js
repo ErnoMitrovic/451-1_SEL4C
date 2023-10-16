@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Modal, IconButton, Alert } from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
 
 const styleModal = {
     position: 'absolute',
@@ -11,17 +11,29 @@ const styleModal = {
     borderRadius: '1rem',
 };
 
-export default function SuccessModal({ openSuccess, handleCloseSuccess, successMessage }) {
+export default function SuccessModal({ open, handleClose, successMessage }) {
     return (
         <Modal
-            open={openSuccess}
-            onClose={handleCloseSuccess}
+            open={open}
+            onClose={handleClose}
             aria-labelledby="child-modal-title"
             aria-describedby="child-modal-description"
         >
             <Box sx={{ ...styleModal }}>
                 <Alert
                     severity='success'
+                    action={
+                        <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                handleClose();
+                            }}
+                        >
+                            <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                    }
                     autoFocus={false}
                 >
                     {successMessage}

@@ -7,6 +7,7 @@ import { RadarChart } from '../components/Charts/RadarChart';
 import { BarChart } from '../components/Charts/BarChart';
 import { getUsers } from '../models/users';
 import { getData as getActivities, filterUserDefaults, getActivityProgress } from '../models/activities';
+import ErrorModal from '../components/ErrorModal';
 
 function CircularProgressWithLabel(props) {
     return (
@@ -64,6 +65,11 @@ const SingleMetrics = () => {
     // Radar & bar chart data
     const [radarData, setRadarData] = useState(initialBlankRadarDataForSingleUser);
     const [barData, setBarData] = useState(initialBlankBarData);
+
+    // Error handling
+    const [openError, setOpenError] = React.useState(false);
+    const handleCloseError = () => setOpenError(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const handleUserChange = (event, newValue) => {
         setSelectedUser(newValue);
@@ -138,24 +144,30 @@ const SingleMetrics = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const data = await getUsers();
-            const rawActivitiesData = await getActivities();
-            const activitiesData = await filterUserDefaults(rawActivitiesData);
-            const activitiesProgress = getActivityProgress(activitiesData);
-            // Add to users their progress based on activitiesProgress
-            const updatedUsers = data.map(user => {
-                const userProgress = activitiesProgress.find(progress => progress.user === user.user);
-                if (userProgress) {
-                    // If user has a matching activity progress, add user.progress
-                    user.progress = userProgress.progress;
-                } else {
-                    // If no matching progress found, set user.progress to 0
-                    user.progress = 0;
-                }
-                return user;
-            });
-            setUsers(updatedUsers);
-            setLoading(false);
+            try {
+                const data = await getUsers();
+                const rawActivitiesData = await getActivities();
+                const activitiesData = await filterUserDefaults(rawActivitiesData);
+                const activitiesProgress = getActivityProgress(activitiesData);
+                // Add to users their progress based on activitiesProgress
+                const updatedUsers = data.map(user => {
+                    const userProgress = activitiesProgress.find(progress => progress.user === user.user);
+                    if (userProgress) {
+                        // If user has a matching activity progress, add user.progress
+                        user.progress = userProgress.progress;
+                    } else {
+                        // If no matching progress found, set user.progress to 0
+                        user.progress = 0;
+                    }
+                    return user;
+                });
+                setUsers(updatedUsers);
+            } catch (error) {
+                setErrorMessage('Error al cargar los datos');
+                setOpenError(true);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, []);
@@ -223,6 +235,7 @@ const SingleMetrics = () => {
                             )}
                         </Stack>
                     </Sel4cCard>
+                    <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage} />
                 </div>
             )}
         </>

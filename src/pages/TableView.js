@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import { Sel4cTable } from "../components/Sel4cTable";
 import { usersColumns, getUsers, deleteData as deleteUser } from "../models/users";
 import { formResponseColumns, getData as getFormResponses } from "../models/forms";
@@ -8,6 +8,10 @@ import { activitiesColumns, getData as getActivities, filterUserDefaults, getAct
 import ErrorModal from "../components/ErrorModal";
 
 function TableView() {
+
+    // Loading state to display a loading spinner while the data is being fetched
+    const [loading, setLoading] = React.useState(true);
+
     // Track users data
     const [usersData, setUsersData] = useState([]);
     // Track form responses data
@@ -46,6 +50,7 @@ function TableView() {
     useEffect(() => {
         // Fetch data from API or any other source
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const usersData = await getUsers();
                 setUsersData(usersData);
@@ -70,52 +75,69 @@ function TableView() {
                 // Handle errors, e.g., show an error message
                 setErrorMessage('Error al cargar datos');
                 setOpenError(true);
+            } finally {
+                setLoading(false);
             }
         };
         fetchData();
     }, []);
 
     return (
-        <div id="tables-content">
-            <Box sx={{
-                width: '100%',
-                padding: '3rem'
-            }}>
-                <Typography variant="h3" align="center"> Usuarios: respuestas y actividades </Typography>
-                <Sel4cTable
-                    title="Datos de Usuarios"
-                    data={usersData}
-                    columns={usersColumns}
-                    options={{
-                        onRowsDelete: handleUserRowsDelete,
-                        selectableRowsOnClick: true,
-                        print: false,
-                        responsive: "simple",
+        <>
+            {loading ? (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
                     }}
-                />
-                <Sel4cTable
-                    title="Respuestas de formulario"
-                    data={formResponseData}
-                    columns={formResponseColumns}
-                    options={{
-                        print: false,
-                        responsive: "simple",
-                        customToolbarSelect: () => {},
-                    }}
-                />
-                <Sel4cTable
-                    title="Progreso de Actividades por Usuario"
-                    data={activitiesData}
-                    columns={activitiesColumns}
-                    options={{
-                        print: false,
-                        responsive: "simple",
-                        customToolbarSelect: () => {},
-                    }}
-                />
-            </Box>
-            <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
-        </div>
+                >
+                    <CircularProgress />
+                </div>
+            ) : (
+                <div id="tables-content">
+                    <Box sx={{
+                        width: '100%',
+                        padding: '3rem'
+                    }}>
+                        <Typography variant="h3" align="center"> Usuarios: respuestas y actividades </Typography>
+                        <Sel4cTable
+                            title="Datos de Usuarios"
+                            data={usersData}
+                            columns={usersColumns}
+                            options={{
+                                onRowsDelete: handleUserRowsDelete,
+                                selectableRowsOnClick: true,
+                                print: false,
+                                responsive: "simple",
+                            }}
+                        />
+                        <Sel4cTable
+                            title="Respuestas de formulario"
+                            data={formResponseData}
+                            columns={formResponseColumns}
+                            options={{
+                                print: false,
+                                responsive: "simple",
+                                customToolbarSelect: () => { },
+                            }}
+                        />
+                        <Sel4cTable
+                            title="Progreso de Actividades por Usuario"
+                            data={activitiesData}
+                            columns={activitiesColumns}
+                            options={{
+                                print: false,
+                                responsive: "simple",
+                                customToolbarSelect: () => { },
+                            }}
+                        />
+                    </Box>
+                    <ErrorModal open={openError} handleClose={handleCloseError} errorMessage={errorMessage} />
+                </div>
+            )}
+        </>
     );
 }
 
