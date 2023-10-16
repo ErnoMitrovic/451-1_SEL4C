@@ -77,7 +77,7 @@ export function FormsCard({ onLogin }) {
                 </Typography>
                 <Stack component='form' width={0.7} spacing={2} alignItems='center' onSubmit={handleLogin}>
                     <FormControl fullWidth>
-                        <InputLabel htmlFor="email">Email</InputLabel>
+                        <InputLabel htmlFor="email">Correo</InputLabel>
                         <Input
                             id="email"
                             aria-describedby="email-helper-text"
@@ -88,7 +88,7 @@ export function FormsCard({ onLogin }) {
                         <FormHelperText id="email-helper-text">{displayHelperTextEmail()}</FormHelperText>
                     </FormControl>
                     <FormControl fullWidth>
-                        <InputLabel htmlFor="password">Password</InputLabel>
+                        <InputLabel htmlFor="password">Contraseña</InputLabel>
                         <Input
                             id="password"
                             aria-describedby="password-helper-text"
@@ -99,10 +99,10 @@ export function FormsCard({ onLogin }) {
                         />
                         <FormHelperText id="password-helper-text">{displayhelperTextPassword()}</FormHelperText>
                         <Link to='/forgetPassword'>
-                            <Typography textAlign='right'>Forgot your password?</Typography>
+                            <Typography textAlign='right'>¿Olvidaste tu contraseña?</Typography>
                         </Link>
                     </FormControl>
-                    <Button type="submit" variant="contained">Login</Button>
+                    <Button type="submit" variant="contained">Ingresar</Button>
                 </Stack>
             </Stack>
             <ErrorModal openError={openError} handleCloseError={handleCloseError} errorMessage={errorMessage}/>

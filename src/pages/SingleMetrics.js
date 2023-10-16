@@ -126,7 +126,7 @@ const SingleMetrics = () => {
                                     getOptionLabel={(user) => user.full_name}
                                     value={selectedUser}
                                     onChange={handleUserChange}
-                                    renderInput={(params) => <TextField {...params} label="Select User" />}
+                                    renderInput={(params) => <TextField {...params} label="Selecciona usuario" />}
                                 />
                                 {selectedUser && (
                                     <>
