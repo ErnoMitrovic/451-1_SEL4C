@@ -1,15 +1,15 @@
 import './Profile.sass'
 import React from "react";
-import { Box, CircularProgress } from '@mui/material';
+import Box from '@mui/material/Box';
 import ProfileUpdateModal from '../components/Profile/ProfileUpdateModal';
 import { getMe } from "../models/users";
 import ErrorModal from '../components/ErrorModal';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Profile() {
-
     // Loading state to display a loading spinner while the data is being fetched
     const [loading, setLoading] = React.useState(true);
 
@@ -20,11 +20,11 @@ export default function Profile() {
     const [openError, setOpenError] = React.useState(false);
     const handleCloseError = () => setOpenError(false);
     const [errorMessage, setErrorMessage] = React.useState('');
+    const navigate = useNavigate();
     // Success feedback
     const [openSuccess, setOpenSuccess] = React.useState(false);
     const handleCloseSuccess = () => setOpenSuccess(false);
     const [successMessage, setSuccessMessage] = React.useState('');
-    const navigate = useNavigate();
 
     React.useEffect(() => {
         setLoading(true);
@@ -48,8 +48,6 @@ export default function Profile() {
     const handleUserDataUpdateSuccess = (userData) => {
         setName(userData.name);
         setEmail(userData.email);
-        setSuccessMessage('Datos actualizados');
-        setOpenSuccess(true);
     }
 
 
@@ -75,9 +73,9 @@ export default function Profile() {
                         justifyContent: 'center',
                         flexWrap: 'wrap',
                         flexGrow: 1,
-                        margin: '2rem 0',
+                        margin: '2rem 0'
                     }}>
-                        <p className='title'>Información del perfil</p>
+                        <p className='title'>Esta es la página de profile</p>
                         <div className="info">
                             <span className="label">Correo electrónico:</span> {email}
                         </div>
@@ -87,11 +85,11 @@ export default function Profile() {
                         <div>
                             <ProfileUpdateModal onSuccess={handleUserDataUpdateSuccess} />
                         </div>
-                        <Button variant='contained' sx={{marginTop: 2}} onClick={
-                    () => {
-                        navigate('/change-password')
-                    }
-                } >
+                        <Button variant='contained' sx={{ marginTop: 2 }} onClick={
+                            () => {
+                                navigate('/change-password')
+                            }
+                        } >
                             Cambiar contraseña
                         </Button>
                     </Box>
