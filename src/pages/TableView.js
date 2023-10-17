@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { Sel4cTable } from "../components/Sel4cTable";
 import { usersColumns, getUsers, deleteData as deleteUser } from "../models/users";
-import { formResponseColumns, getData as getFormResponses } from "../models/forms";
+import { getData as getFormResponses } from "../models/forms";
 import { getData as getQuestions } from '../models/questions';
 import { activitiesColumns, getData as getActivities, filterUserDefaults, getActivityProgress } from "../models/activities";
 import ErrorModal from "../components/ErrorModal";
@@ -14,8 +14,6 @@ function TableView() {
 
     // Track users data
     const [usersData, setUsersData] = useState([]);
-    // Track form responses data
-    const [formResponseData, setFormResponseData] = useState([]);
     // Track activities data
     const [activitiesData, setActivitiesData] = useState([]);
 
@@ -67,7 +65,6 @@ function TableView() {
                     const question = questionsData.find((question) => question.id === formResponse.question);
                     formResponse.question = `${question.id}. ${question.question}`;
                 });
-                setFormResponseData(formResponseData);
                 const rawActivitiesData = await getActivities();
                 const activitiesData = await filterUserDefaults(rawActivitiesData);
                 setActivitiesData(getActivityProgress(activitiesData));
@@ -111,16 +108,6 @@ function TableView() {
                                 selectableRowsOnClick: true,
                                 print: false,
                                 responsive: "simple",
-                            }}
-                        />
-                        <Sel4cTable
-                            title="Respuestas de formulario"
-                            data={formResponseData}
-                            columns={formResponseColumns}
-                            options={{
-                                print: false,
-                                responsive: "simple",
-                                customToolbarSelect: () => { },
                             }}
                         />
                         <Sel4cTable

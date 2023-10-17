@@ -9,6 +9,7 @@ import { filterData, calculateAverage, initialBlankRadarData, initialBlankBarDat
 import { FilterList, TableChartOutlined } from '@mui/icons-material';
 import { Stack, Modal, Container, IconButton, Grid, Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import { getUsers } from '../models/users';
+import { getData as getActivities, filterUserDefaults, getActivityProgress } from '../models/activities';
 import ErrorModal from '../components/ErrorModal';
 
 export default function MetricsPanel() {
@@ -20,6 +21,10 @@ export default function MetricsPanel() {
     const [fetchedData, setFetchedData] = React.useState({});
     // filteredData is the filtered data from any modal interaction that will be displayed in the charts stored in JSON.
     const [filteredData, setFilteredData] = React.useState({});
+
+    // Activities data
+    const [activitiesNumber, setActivitiesNumber] = React.useState(0);
+    const [activities100, setActivities100] = React.useState(0);
 
     // Update the radar chart data. 
     // radarData is the data formatted for the chart.js.
@@ -155,6 +160,14 @@ export default function MetricsPanel() {
                         pointHoverBorderColor: 'rgb(255, 255, 0)'
                     }]
                 });
+
+                // Filter and set the activities data for the metrics top cards
+                const rawActivitiesData = await getActivities();
+                const activitiesData = await filterUserDefaults(rawActivitiesData);
+                setActivitiesNumber(activitiesData.length);
+                const activitiesProgress = getActivityProgress(activitiesData);
+                setActivities100(activitiesProgress.filter(activity => activity.progress === 100).length);
+
             } catch (error) {
                 setErrorMessage('Error al cargar los datos');
                 setOpenError(true);
@@ -210,10 +223,10 @@ export default function MetricsPanel() {
                             <Card sx={{ width: '80%', m: '1rem', backgroundColor: '#98d6fa', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
                                 <CardContent>
                                     <Typography variant="h4" component="div">
-                                        Archivos subidos
+                                        Usuarios con 100%
                                     </Typography>
                                     <Typography variant="body2">
-                                        Total: 2
+                                        Total: {activities100}
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -225,7 +238,7 @@ export default function MetricsPanel() {
                                         Actividades recibidas
                                     </Typography>
                                     <Typography variant="body2">
-                                        Total: 4
+                                        Total: {activitiesNumber}
                                     </Typography>
                                 </CardContent>
                             </Card>

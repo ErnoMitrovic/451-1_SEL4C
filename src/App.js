@@ -37,6 +37,7 @@ function App() {
     const onLogout = () => {
         console.log("Logging out...")
         removeToken();
+        setIsAuthenticated(false);
     };
 
     return (

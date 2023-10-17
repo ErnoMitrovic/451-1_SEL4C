@@ -48,6 +48,8 @@ export default function Profile() {
     const handleUserDataUpdateSuccess = (userData) => {
         setName(userData.name);
         setEmail(userData.email);
+        setSuccessMessage('Datos actualizados');
+        setOpenSuccess(true);
     }
 
 
@@ -75,7 +77,7 @@ export default function Profile() {
                         flexGrow: 1,
                         margin: '2rem 0'
                     }}>
-                        <p className='title'>Esta es la página de profile</p>
+                        <p className='title'>Información del perfil</p>
                         <div className="info">
                             <span className="label">Correo electrónico:</span> {email}
                         </div>

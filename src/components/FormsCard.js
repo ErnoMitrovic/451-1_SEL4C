@@ -25,13 +25,13 @@ export function FormsCard({ onLogin }) {
     }
 
     const displayHelperTextEmail = () => {
-        if (!email) return 'Please enter your email';
-        else if (setEmailError(email)) return 'Please enter a valid email';
+        if (!email) return 'Por favor, introduce tu correo electrónico';
+        else if (setEmailError(email)) return 'Por favor, ingresa un correo electrónico válido';
         return '';
     }
 
     const displayhelperTextPassword = () => {
-        if (!password) return 'Please enter your password';
+        if (!password) return 'Por favor, ingresa tu contraseña';
         return '';
     }
 
