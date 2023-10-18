@@ -3,7 +3,6 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { Sel4cTable } from "../components/Sel4cTable";
 import { usersColumns, getUsers, deleteData as deleteUser } from "../models/users";
 import { getData as getFormResponses } from "../models/forms";
-import { getData as getQuestions } from '../models/questions';
 import { activitiesColumns, getData as getActivities, filterUserDefaults, getActivityProgress } from "../models/activities";
 import ErrorModal from "../components/ErrorModal";
 
@@ -59,15 +58,15 @@ function TableView() {
                     formResponse.user = user.full_name;
 
                 });
-                const questionsData = await getQuestions();
-                // Append question.question to their matching form response
-                formResponseData.forEach((formResponse) => {
-                    const question = questionsData.find((question) => question.id === formResponse.question);
-                    formResponse.question = `${question.id}. ${question.question}`;
-                });
                 const rawActivitiesData = await getActivities();
                 const activitiesData = await filterUserDefaults(rawActivitiesData);
-                setActivitiesData(getActivityProgress(activitiesData));
+                let activitiesProgressData = getActivityProgress(activitiesData);
+                // Append user.full_name to their matching activity
+                activitiesProgressData.forEach((activity) => {
+                    const user = usersData.find((user) => user.user === activity.user);
+                    activity.user = user.full_name;
+                });
+                setActivitiesData(activitiesProgressData);
             } catch (error) {
                 // Handle errors, e.g., show an error message
                 setErrorMessage('Error al cargar datos');
@@ -108,6 +107,7 @@ function TableView() {
                                 selectableRowsOnClick: true,
                                 print: false,
                                 responsive: "simple",
+                                customToolbarSelect: () => { },
                             }}
                         />
                         <Sel4cTable
