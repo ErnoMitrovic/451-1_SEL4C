@@ -3,7 +3,7 @@ import React from "react";
 import { Sel4cCard } from "./Sel4cCard";
 import { createToken, isAdmin } from "../models/token";
 import Cookies from 'universal-cookie';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ErrorModal from "./ErrorModal";
 
 export function FormsCard({ onLogin }) {
@@ -98,9 +98,6 @@ export function FormsCard({ onLogin }) {
                             error={!password}
                         />
                         <FormHelperText id="password-helper-text">{displayhelperTextPassword()}</FormHelperText>
-                        <Link to='/forgetPassword'>
-                            <Typography textAlign='right'>¿Olvidaste tu contraseña?</Typography>
-                        </Link>
                     </FormControl>
                     <Button type="submit" variant="contained">Ingresar</Button>
                 </Stack>
