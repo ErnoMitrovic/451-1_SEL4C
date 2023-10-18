@@ -39,9 +39,9 @@ export default function ProfileUpdateModal({ onSuccess }) {
 
     const displayHelperTextEmail = () => {
         if (email && !isEmailValid()) {
-            return 'Invalid email address';
+            return 'Dirección de correo electrónico inválida';
         } else if (email && confirmEmail && email !== confirmEmail) {
-            return 'Email addresses do not match';
+            return 'Los correos electrónicos no coinciden';
         }
         return '';
     };

@@ -57,13 +57,13 @@ export default function AdminModal({ onSuccess, usersData }) {
 
     const isEmailValid = () => {
         // Regular expression for email validation
-        const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
         return emailRegex.test(email);
     };
 
     const displayHelperTextEmail = () => {
         if (email && !isEmailValid()) {
-            return 'Invalid email address';
+            return 'Dirección de correo electrónico inválida';
         }
         return '';
     };
@@ -74,7 +74,7 @@ export default function AdminModal({ onSuccess, usersData }) {
 
     const displayHelperTextPassword = () => {
         if (password && passwordConfirm && !arePasswordsMatching()) {
-            return 'Passwords do not match';
+            return 'Las contraseñas no coinciden';
         }
         return '';
     };
