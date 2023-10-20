@@ -47,7 +47,7 @@ export function ChangePassword() {
     function handleSubmit(event) {
         event.preventDefault();
         if (error !== '' && errorConfirm !== '') {
-            changePassword(oldPassword, newPassword).then((response) => {
+            changePassword(newPassword).then((response) => {
                 console.log(response.data);
                 setModalAlertOpen(true);
                 setModalAlertSeverity('success');
