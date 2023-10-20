@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Sel4cCard } from "../../components/Sel4cCard";
 import { changePassword } from "../../models/passwords";
 import GenericModalAlert from "../../components/GenericModalAlert";
+import { useNavigate } from "react-router-dom";
 
 export function ChangePassword() {
 
@@ -17,6 +18,7 @@ export function ChangePassword() {
     const [modalAlertOpen, setModalAlertOpen] = React.useState(false);
     const [modalAlertMessage, setModalAlertMessage] = React.useState('Contraseña cambiada correctamente');
 
+    const navigate = useNavigate();
     // Validate new passwords according to the following rules:
     // - Your password can’t be too similar to your other personal information.
     // - Your password must contain at least 8 characters.
@@ -46,18 +48,25 @@ export function ChangePassword() {
 
     function handleSubmit(event) {
         event.preventDefault();
-        if (error !== '' && errorConfirm !== '') {
+        if (error === '' && errorConfirm === '') {
             changePassword(newPassword).then((response) => {
                 console.log(response.data);
                 setModalAlertOpen(true);
                 setModalAlertSeverity('success');
-                setModalAlertMessage(response.data.message);
+                setModalAlertMessage('Contraseña cambiada correctamente');
             }).catch((error) => {
-                console.log(error.response.data.message)
+                console.log(error.response.data)
                 setModalAlertOpen(true);
                 setModalAlertSeverity('error');
                 setModalAlertMessage('Error al cambiar contraseña: ' + error.response.data.message);
             })
+        }
+    }
+
+    function handleClose(){
+        setModalAlertOpen(false);
+        if (modalAlertSeverity === 'success'){
+            navigate('/profile')
         }
     }
 
@@ -115,7 +124,12 @@ export function ChangePassword() {
                     <FormHelperText>{errorConfirm}</FormHelperText>
                 </FormControl>
                 <Button type="submit" variant="contained">Cambiar contraseña</Button>
-                <GenericModalAlert severity={modalAlertSeverity} open={Boolean(modalAlertOpen)} message={modalAlertMessage} />
+                <GenericModalAlert
+                    severity={modalAlertSeverity}
+                    open={Boolean(modalAlertOpen)}
+                    message={modalAlertMessage}
+                    handleClose={handleClose}
+                />
             </Stack>
         </Sel4cCard>
     )
