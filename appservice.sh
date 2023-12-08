@@ -2,7 +2,7 @@
 
 APP_NAME=$1
 
-sudo tee /etc/systemd/system/sel4c.service > /dev/null <<EOL
+sudo tee /etc/systemd/system/$APP_NAME.service > /dev/null <<EOL
 [Unit]
 Description=$APP_NAME App
 
